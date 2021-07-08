@@ -1,14 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, Alert, Pressable, StyleSheet, TextInput, FlatList, ListRenderItem } from "react-native";
 
-import locationService, { location } from '../service/locationService';
+import locationService, { location, defaultLocation, locationKey } from '../service/locationService';
+import { getValue, storeValue } from '../service/storageService';
 
+/**
+ * A component that shows the currently selected location.
+ * Will open a modal to choose a location when selected.
+ * Loads the last picked location from async storage.
+ *
+ * @return {*} 
+ */
 const Location = () => {
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
-    const [currentLocation, setCurrentLocation] = useState<location>({ name: "Set Location", code: "" });
+    const [currentLocation, setCurrentLocation] = useState<location>(defaultLocation);
     const [searchValue, setSearchValue] = useState<string>("");
-    const [locations, setLocations] = useState<location[]>([{name:"hello", code: "1111"}]);
+    const [locations, setLocations] = useState<location[]>([]);
+
+    useEffect(() =>{
+        getValue<location>(locationKey, defaultLocation)
+            .then(location => {
+                    setCurrentLocation(location); 
+                    console.log(`got location: ${JSON.stringify(location)}`) 
+                });
+    }, []);
 
     const onSearchChange = async (text: string) => {
 
@@ -21,11 +37,20 @@ const Location = () => {
         setLocations(await locationService.searchLocation(text));
     }
 
-    const renderLocation: ListRenderItem<location> = ({item}) => {
+    const renderLocation: ListRenderItem<location> = ({ item }) => {
+
         return (
-            <View >
-                <Text>{item.name}</Text>
-            </View>
+            <Pressable
+                onPress={() => {
+                    setCurrentLocation(item);
+                    setModalVisible(false);
+                    storeValue(locationKey, item);
+                }}
+            >
+                <View >
+                    <Text>{item.name}</Text>
+                </View>
+            </Pressable>
         );
     }
 
