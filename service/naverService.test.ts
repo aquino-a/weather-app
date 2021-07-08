@@ -15,3 +15,16 @@ test('search 봉천동', async () => {
             ]);
 
   });
+
+  test('search 이태원', async () => {
+    
+    expect(
+        await ns.searchLocation('이태원'))
+        .toStrictEqual<location[]>(
+            [
+                { name: '서울특별시 용산구 이태원동', code: '09170130' },
+                { name: '서울특별시 용산구 이태원2동', code: '09170660' },
+                { name: '서울특별시 용산구 이태원1동', code: '09170650' },
+            ]);
+
+  });

@@ -41,8 +41,8 @@ export class naverService implements locationService {
      * @memberof naverService
      */
     parseLocations = (rawObject: any): location[] => {
-        return rawObject.items
-            .map((a: string[][]) => ({ name: a[0][0][0], code: a[0][1][0] }));
+        return rawObject.items[0]
+            .map((a: string[][]) => ({ name: a[0][0], code: a[1][0] }));
     } 
 }
 
