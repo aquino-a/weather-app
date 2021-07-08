@@ -5,7 +5,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "test": "jest"
   },
   "dependencies": {
     "expo": "~42.0.0",
@@ -17,8 +18,11 @@
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
+    "@types/jest": "^26.0.24",
     "@types/react": "~16.9.35",
     "@types/react-native": "~0.63.2",
+    "jest": "^27.0.6",
+    "node-fetch": "^2.6.1",
     "typescript": "~4.0.0"
   },
   "private": true
