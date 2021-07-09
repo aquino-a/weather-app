@@ -15,6 +15,7 @@ export class naverService implements locationService, weatherService {
     static readonly TEMPERATURE_REGEX: RegExp = new RegExp('(\\d+)°');
     static readonly PERCENT_REGEX: RegExp = new RegExp('(\\d+)%');
     static readonly SPEED_REGEX: RegExp = new RegExp('(\\d+) *m/s');
+    static readonly RAIN_REGEX: RegExp = new RegExp('(\\d+(?:\\.\\d+)?) *mm');
 
     /**
      * Searchs the naver api for the location name and location code using a text query.
@@ -85,6 +86,8 @@ export class naverService implements locationService, weatherService {
         const currentTemperature = naverService.parseTemperature(weatherArea);
         const listDetails = naverService.parseListDetails(weatherArea);
         const currentCondition = weatherArea.getElementsByClassName('weather')[0].textContent as string;
+        const rainAmount = naverService.parseRain(weatherArea);
+        const dust = naverService.parseDust(weatherDoc);
 
         return {
             temperature: currentTemperature,
@@ -92,23 +95,26 @@ export class naverService implements locationService, weatherService {
             windSpeed: listDetails.windSpeed,
             windDirection: listDetails.windDirection,
             feel: listDetails.feel,
-            dust: '',
-            microDust: '',
+            dust: dust.dust,
+            microDust: dust.microDust,
             condition: currentCondition,
-            rainAmount: 0,
+            rainAmount: rainAmount,
             rainForecasts: [],
             humidityForecasts: [],
             windForecasts: [],
             temperatureForecasts: []
         };
     }
-    
+   
     private static parseTemperature(currentWeather: Element): temperature {
+        
         const line = currentWeather.getElementsByClassName('current')[0].textContent;
+
         return { degrees: Number(naverService.TEMPERATURE_REGEX.exec(line)[1]), type: scale.C } ;
     }
 
     private static parseListDetails(currentWeather: Element): any {
+        
         const list = currentWeather.getElementsByClassName('summary_list')[0];
 
         return {
@@ -117,6 +123,27 @@ export class naverService implements locationService, weatherService {
             windSpeed: Number(naverService.SPEED_REGEX.exec(list.children[3].textContent)[1]),
             feel: { degrees: Number(naverService.TEMPERATURE_REGEX.exec(list.children[5].textContent)[1]), type: scale.C }
         };
+    }
+
+    private static parseRain(weatherArea: HTMLElement): number {
+        
+        const rainAmount = weatherArea
+            .getElementsByClassName('summary_rainfall')[0]
+            .getElementsByTagName('strong')[0].textContent;
+
+        return Number(naverService.RAIN_REGEX.exec(rainAmount)[1])
+    }
+
+    private static parseDust(weatherDoc: Document): any {
+
+        const list = weatherDoc
+            .getElementsByClassName('today_chart_list')[0]
+            .getElementsByClassName('level_text');
+        
+        return {
+            dust: list[0].textContent,
+            microDust: list[1].textContent,
+        }
     }
 }
 
