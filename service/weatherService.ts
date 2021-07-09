@@ -18,7 +18,7 @@ export interface weather {
     rainForecasts: rainForecast[];
     humidityForecasts: humidityForecast[];
     windForecasts: windForecast[];
-    temperatureForecasts: rainForecast[];
+    weatherForecasts: weatherForecast[];
 }
 
 export interface temperature {

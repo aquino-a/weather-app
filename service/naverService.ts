@@ -1,6 +1,6 @@
 import { template } from "@babel/core";
 import { location, locationService } from "./locationService";
-import { scale, temperature, weather, weatherService } from "./weatherService";
+import { scale, temperature, weather, weatherForecast, weatherService } from "./weatherService";
 
 /**
  * A service that communicates with the naver api.
@@ -12,7 +12,7 @@ import { scale, temperature, weather, weatherService } from "./weatherService";
 export class naverService implements locationService, weatherService {
 
     static readonly NAVER_BASE_URL: string = "weather.naver.com";
-    static readonly TEMPERATURE_REGEX: RegExp = new RegExp('(\\d+)°');
+    static readonly TEMPERATURE_REGEX: RegExp = new RegExp('(\\d+)(?:°|도)');
     static readonly PERCENT_REGEX: RegExp = new RegExp('(\\d+)%');
     static readonly SPEED_REGEX: RegExp = new RegExp('(\\d+) *m/s');
     static readonly RAIN_REGEX: RegExp = new RegExp('(\\d+(?:\\.\\d+)?) *mm');
@@ -89,6 +89,9 @@ export class naverService implements locationService, weatherService {
         const rainAmount = naverService.parseRain(weatherArea);
         const dust = naverService.parseDust(weatherDoc);
 
+        //forecasts
+        const weatherForecasts = naverService.parseWeatherForecasts(weatherDoc);
+
         return {
             temperature: currentTemperature,
             humidity: listDetails.humidity,
@@ -102,10 +105,10 @@ export class naverService implements locationService, weatherService {
             rainForecasts: [],
             humidityForecasts: [],
             windForecasts: [],
-            temperatureForecasts: []
+            weatherForecasts: []
         };
     }
-   
+
     /**
      * Parses the temperature from the weather area section.
      *
@@ -116,10 +119,10 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     private static parseTemperature(weatherArea: Element): temperature {
-        
+
         const line = weatherArea.getElementsByClassName('current')[0].textContent;
 
-        return { degrees: Number(naverService.TEMPERATURE_REGEX.exec(line)[1]), type: scale.C } ;
+        return { degrees: Number(naverService.TEMPERATURE_REGEX.exec(line)[1]), type: scale.C };
     }
 
     /**
@@ -132,7 +135,7 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     private static parseListDetails(weatherArea: Element): any {
-        
+
         const list = weatherArea.getElementsByClassName('summary_list')[0];
 
         return {
@@ -153,7 +156,7 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     private static parseRain(weatherArea: HTMLElement): number {
-        
+
         const rainAmount = weatherArea
             .getElementsByClassName('summary_rainfall')[0]
             .getElementsByTagName('strong')[0].textContent;
@@ -175,11 +178,47 @@ export class naverService implements locationService, weatherService {
         const list = weatherDoc
             .getElementsByClassName('today_chart_list')[0]
             .getElementsByClassName('level_text');
-        
+
         return {
             dust: list[0].textContent,
             microDust: list[1].textContent,
         }
+    }
+
+
+    /**
+     * Parse the weather forecasts from the main weather page.
+     *
+     * @private
+     * @static
+     * @param {Document} weatherDoc
+     * @return {*}  {weatherForecast[]}
+     * @memberof naverService
+     */
+    private static parseWeatherForecasts(weatherDoc: Document): weatherForecast[] {
+        return Array.from(
+            weatherDoc
+                .getElementsByClassName('time_list align_left')[0]
+                .children)
+            .map((e: Element): weatherForecast => {
+                
+                const degrees = Number(e.getAttribute('data-tmpr'));
+                const condition = e.getAttribute('data-wetr-txt') as string;
+
+                const ts = e.getAttribute('data-ymdt') as string;
+                const time = new Date(
+                    Number(ts.substr(0,4)),
+                    Number(ts.substr(4,2)), 
+                    Number(ts.substr(6,2)),
+                    Number(ts.substr(8,2)),
+                    0,0,0);
+
+                return {
+                    temperature: { degrees: degrees, type: scale.C },
+                    condition: condition,
+                    time: time,
+                }
+            });
     }
 }
 
