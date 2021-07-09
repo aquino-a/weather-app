@@ -106,16 +106,34 @@ export class naverService implements locationService, weatherService {
         };
     }
    
-    private static parseTemperature(currentWeather: Element): temperature {
+    /**
+     * Parses the temperature from the weather area section.
+     *
+     * @private
+     * @static
+     * @param {Element} weatherArea
+     * @return {*}  {temperature}
+     * @memberof naverService
+     */
+    private static parseTemperature(weatherArea: Element): temperature {
         
-        const line = currentWeather.getElementsByClassName('current')[0].textContent;
+        const line = weatherArea.getElementsByClassName('current')[0].textContent;
 
         return { degrees: Number(naverService.TEMPERATURE_REGEX.exec(line)[1]), type: scale.C } ;
     }
 
-    private static parseListDetails(currentWeather: Element): any {
+    /**
+     * Parses the details of the summary list in the weather area.
+     *
+     * @private
+     * @static
+     * @param {Element} weatherArea
+     * @return {*}  {*}
+     * @memberof naverService
+     */
+    private static parseListDetails(weatherArea: Element): any {
         
-        const list = currentWeather.getElementsByClassName('summary_list')[0];
+        const list = weatherArea.getElementsByClassName('summary_list')[0];
 
         return {
             humidity: Number(naverService.PERCENT_REGEX.exec(list.children[1].textContent)[1]),
@@ -125,6 +143,15 @@ export class naverService implements locationService, weatherService {
         };
     }
 
+    /**
+     * Parse the rain details from the weather area.
+     *
+     * @private
+     * @static
+     * @param {HTMLElement} weatherArea
+     * @return {*}  {number}
+     * @memberof naverService
+     */
     private static parseRain(weatherArea: HTMLElement): number {
         
         const rainAmount = weatherArea
@@ -134,6 +161,15 @@ export class naverService implements locationService, weatherService {
         return Number(naverService.RAIN_REGEX.exec(rainAmount)[1])
     }
 
+    /**
+     * Parse the dust details from the main weather document.
+     *
+     * @private
+     * @static
+     * @param {Document} weatherDoc
+     * @return {*}  {*}
+     * @memberof naverService
+     */
     private static parseDust(weatherDoc: Document): any {
 
         const list = weatherDoc
