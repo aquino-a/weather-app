@@ -1,6 +1,6 @@
-import { location } from './locationService';
-import { naverService } from './naverService';
-import { temperature, weather } from './weatherService';
+import { location } from '../locationService';
+import { naverService } from '../naverService';
+import { temperature, weather } from '../weatherService';
 
 // const jsdom = require("jsdom");
 const { JSDOM } = require("jsdom");
