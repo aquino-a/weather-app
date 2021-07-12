@@ -4,6 +4,26 @@ export interface weatherService {
     searchWeather(locationCode: string): Promise<weather>;
 }
 
+class fakeWeatherService implements weatherService {
+    searchWeather(locationCode: string): Promise<weather> {
+        return Promise.resolve({
+            condition: 'condition',
+            dust: 'good',
+            feel: { degrees: Math.ceil((Math.random() * 10) + 20), type: scale.C },
+            humidity: Math.ceil(Math.random() * 100),
+            humidityForecasts: [],
+            microDust: 'good',
+            rainAmount: Math.ceil(Math.random() * 5),
+            rainForecasts: [],
+            temperature: { degrees: Math.ceil((Math.random() * 10) + 20), type: scale.F },
+            weatherForecasts: [],
+            windDirection: 'north west',
+            windForecasts: [],
+            windSpeed: Math.ceil(Math.random() * 5)
+        });
+    }
+}
+
 export interface weather {
     temperature: temperature;
     humidity: number;
@@ -52,3 +72,8 @@ export interface windForecast {
     speed: number;
     time: Date;
 }
+
+
+const fakeService: weatherService = new fakeWeatherService();
+
+export default fakeService;
