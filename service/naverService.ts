@@ -302,7 +302,38 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     private static parseWindForecasts(weatherDoc: Document): windForecast[] {
-        throw new Error("Method not implemented.");
+
+        const windSection = weatherDoc.querySelector('div[data-nclk="wtk.windhrscr"]');
+
+        const directions = windSection?.
+            querySelector('tr.row_icon')?.
+            querySelectorAll('td.data');
+
+        const speeds = windSection?.
+            querySelector('tr.row_graph')?.
+            querySelectorAll('td.data');
+
+        if (directions === undefined
+            || speeds === undefined
+            || directions.length != speeds.length) {
+            return [];
+        }
+
+        const windForecasts: windForecast[] = [];
+        for (let i = 0; i < directions.length; i++) {
+            const direction = directions[i];
+            const speed = speeds[i];
+
+            windForecasts.push(
+                {
+                    direction: direction.querySelector('span.value')?.textContent as string,
+                    speed: Number(speed.querySelector('span.num')?.textContent),
+                    time: naverService.parseTime(speed.getAttribute('data-ymdt') as string)
+                }
+            );
+        }
+
+        return windForecasts;
     }
 
     /**
