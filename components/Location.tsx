@@ -11,7 +11,7 @@ import { getValue, storeValue } from '../service/storageService';
  *
  * @return {*} 
  */
-const Location = (props: LocationProps) => {
+const Location = (props: locationProps) => {
     
     const { onLocationChange } = props;
 
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     }
 });
 
-interface LocationProps {
+interface locationProps {
     onLocationChange: ((location: location) => void) | null;
 }
 
