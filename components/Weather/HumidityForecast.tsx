@@ -27,13 +27,13 @@ const HumidityForecast = (props: weatherChildProps) => {
     return (
         <View>
             <Text>
-                Humidity: 
+                Humidity:
             </Text>
             <FlatList
                 style={styles.list}
                 data={humidityForecasts}
                 renderItem={renderHumidity}
-                // keyExtractor={humidity => humidity.time.getTime().toString()}
+                keyExtractor={(humidity, index) => humidity.time.getTime().toString() + index}
                 horizontal={true}
             />
         </View>
@@ -42,8 +42,8 @@ const HumidityForecast = (props: weatherChildProps) => {
 
 const styles = StyleSheet.create({
     list: {
-      width: 500
+        width: 250
     },
-  });
+});
 
 export default HumidityForecast;
