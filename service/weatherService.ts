@@ -18,7 +18,7 @@ class fakeWeatherService implements weatherService {
             temperature: { degrees: Math.ceil((Math.random() * 10) + 20), type: scale.F },
             weatherForecasts: this.generateWeatherForecasts(),
             windDirection: 'north west',
-            windForecasts: [],
+            windForecasts: this.generateWindForecasts(),
             windSpeed: Math.ceil(Math.random() * 5)
         });
     }
@@ -60,7 +60,21 @@ class fakeWeatherService implements weatherService {
         }
         return forecasts;
     }
-    
+
+    generateWindForecasts = (): windForecast[] => {
+
+        const forecasts: windForecast[] = [];
+        for (let i = 0; i < 70; i++) {
+            forecasts.push({
+                direction: 'north west',
+                speed: Math.ceil(Math.random() * 5),
+                time: new Date()
+            });
+        }
+        return forecasts;
+    }
+
+
 }
 
 export interface weather {
