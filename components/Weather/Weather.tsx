@@ -3,7 +3,6 @@ import { View, Text } from 'react-native';
 
 import { location } from '../../service/locationService';
 import weatherService, { weather } from '../../service/weatherService';
-import { locationProps } from '../Location';
 
 import Current from './Current';
 import HumidityForecast from './HumidityForecast';
@@ -21,10 +20,18 @@ import WindForecast from './WindForecast';
 const Weather = (props: weatherProps) => {
 
     const { location } = props;
-    
+
     const [weather, setWeather] = useState<weather | null>(null);
 
-    if (!location) {
+    useEffect(() => {
+        if (!location || location.code === '') {
+            return;
+        }
+        weatherService.searchWeather(location!.code)
+            .then(setWeather);
+    }, [location]);
+
+    if (!location || location.code === '') {
         return (
             <View>
                 <Text>Choose Location.</Text>
@@ -32,10 +39,13 @@ const Weather = (props: weatherProps) => {
         );
     }
 
-    useEffect(() => {
-        weatherService.searchWeather(location!.code)
-            .then(setWeather);
-    }, [location])
+    if (!weather) {
+        return (
+            <View>
+                <Text>Loading..</Text>
+            </View>
+        );
+    }
 
     return (
         <View>
