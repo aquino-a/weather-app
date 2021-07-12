@@ -105,8 +105,8 @@ export class naverService implements locationService, weatherService {
             microDust: dust.microDust,
             condition: currentCondition,
             rainAmount: rainAmount,
-            rainForecasts: [],
-            humidityForecasts: [],
+            rainForecasts: rainForecasts,
+            humidityForecasts: humidityForecasts,
             windForecasts: [],
             weatherForecasts: weatherForecasts
         };
@@ -241,7 +241,7 @@ export class naverService implements locationService, weatherService {
             querySelector('tr.row_graph.row_rain')?.
             querySelectorAll('td.data');
 
-        if (percentages === undefined 
+        if (percentages === undefined
             || amounts === undefined
             || percentages.length != amounts.length) {
             return [];
@@ -275,7 +275,21 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     private static parseHumidityForecasts(weatherDoc: Document): humidityForecast[] {
-        throw new Error("Method not implemented.");
+
+        const humiditySection = weatherDoc.querySelector('div[data-nclk="wtk.humihrscr"]');
+
+        const humidities = humiditySection?.
+            querySelectorAll('td.data');
+
+        if (humidities === undefined) {
+            return [];
+        }
+
+        return Array.from(humidities)
+            .map((e: Element): humidityForecast => ({
+                humidity: Number(e.querySelector('span.num')?.textContent),
+                time: naverService.parseTime(e.getAttribute('data-ymdt') as string)
+            }));
     }
 
     /**
