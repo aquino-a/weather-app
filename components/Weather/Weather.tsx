@@ -25,9 +25,11 @@ const Weather = (props: weatherProps) => {
     const [weather, setWeather] = useState<weather | null>(null);
 
     if (!location) {
-        <View>
-            <Text>Choose Location.</Text>
-        </View>
+        return (
+            <View>
+                <Text>Choose Location.</Text>
+            </View>
+        );
     }
 
     useEffect(() => {
