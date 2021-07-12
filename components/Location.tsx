@@ -11,7 +11,9 @@ import { getValue, storeValue } from '../service/storageService';
  *
  * @return {*} 
  */
-const Location = () => {
+const Location = (props: LocationProps) => {
+    
+    const { onLocationChange } = props;
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [currentLocation, setCurrentLocation] = useState<location>(defaultLocation);
@@ -25,6 +27,10 @@ const Location = () => {
                     console.log(`got location: ${JSON.stringify(location)}`) 
                 });
     }, []);
+
+    useEffect(() =>{
+        onLocationChange?.(currentLocation);
+    }, [ currentLocation ])
 
     const onSearchChange = async (text: string) => {
 
@@ -112,5 +118,9 @@ const styles = StyleSheet.create({
         },
     }
 });
+
+interface LocationProps {
+    onLocationChange: ((location: location) => void) | null;
+}
 
 export default Location;
