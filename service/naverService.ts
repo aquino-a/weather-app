@@ -1,4 +1,3 @@
-import { template } from "@babel/core";
 import { location, locationService } from "./locationService";
 import { humidityForecast, rainForecast, scale, temperature, weather, weatherForecast, weatherService, windForecast } from "./weatherService";
 
@@ -107,7 +106,7 @@ export class naverService implements locationService, weatherService {
             rainAmount: rainAmount,
             rainForecasts: rainForecasts,
             humidityForecasts: humidityForecasts,
-            windForecasts: [],
+            windForecasts: windForecasts,
             weatherForecasts: weatherForecasts
         };
     }

@@ -1,6 +1,6 @@
 import { location } from './locationService';
 import { naverService } from './naverService';
-import { weather } from './weatherService';
+import { temperature, weather } from './weatherService';
 
 // const jsdom = require("jsdom");
 const { JSDOM } = require("jsdom");
@@ -41,10 +41,46 @@ test('search 봉천동', async () => {
 
     const parsedWeather = naverService.parseWeather(weatherDoc);
 
-    fail();
     expect(
-        parsedWeather)
-        .toStrictEqual<any>(
-           undefined);
-
+        parsedWeather.condition)
+        .toBe<string>('소나기');
+    expect(
+        parsedWeather.dust)
+        .toBe<string>('좋음');
+    expect(
+        parsedWeather.condition)
+        .toBe<string>('소나기');
+    expect(
+        parsedWeather.feel)
+        .toStrictEqual<temperature>({degrees: 23, type: 0});
+    expect(
+        parsedWeather.humidity)
+        .toBe<number>(95);
+    expect(
+        parsedWeather.humidityForecasts.length)
+        .toBe<number>(70);
+    expect(
+        parsedWeather.microDust)
+        .toBe<string>('좋음');
+    expect(
+        parsedWeather.rainAmount)
+        .toBe<number>(0.1);
+    expect(
+        parsedWeather.rainForecasts.length)
+        .toBe<number>(70);
+    expect(
+        parsedWeather.temperature)
+        .toStrictEqual<temperature>({degrees: 21, type: 0});
+    expect(
+        parsedWeather.weatherForecasts.length)
+        .toBe<number>(71);
+    expect(
+        parsedWeather.windDirection)
+        .toBe<string>('북북동풍');
+    expect(
+        parsedWeather.windForecasts.length)
+        .toBe<number>(70);
+    expect(
+        parsedWeather.windSpeed)
+        .toBe<number>(1);
   });
