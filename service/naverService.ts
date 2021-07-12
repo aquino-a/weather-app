@@ -1,6 +1,6 @@
 import { template } from "@babel/core";
 import { location, locationService } from "./locationService";
-import { scale, temperature, weather, weatherForecast, weatherService } from "./weatherService";
+import { humidityForecast, rainForecast, scale, temperature, weather, weatherForecast, weatherService, windForecast } from "./weatherService";
 
 /**
  * A service that communicates with the naver api.
@@ -91,6 +91,9 @@ export class naverService implements locationService, weatherService {
 
         //forecasts
         const weatherForecasts = naverService.parseWeatherForecasts(weatherDoc);
+        const rainForecasts = naverService.parseRainForecasts(weatherDoc);
+        const humidityForecasts = naverService.parseHumidityForecasts(weatherDoc);
+        const windForecasts = naverService.parseWindForecasts(weatherDoc);
 
         return {
             temperature: currentTemperature,
@@ -105,7 +108,7 @@ export class naverService implements locationService, weatherService {
             rainForecasts: [],
             humidityForecasts: [],
             windForecasts: [],
-            weatherForecasts: []
+            weatherForecasts: weatherForecasts
         };
     }
 
@@ -201,17 +204,12 @@ export class naverService implements locationService, weatherService {
                 .getElementsByClassName('time_list align_left')[0]
                 .children)
             .map((e: Element): weatherForecast => {
-                
+
                 const degrees = Number(e.getAttribute('data-tmpr'));
                 const condition = e.getAttribute('data-wetr-txt') as string;
 
-                const ts = e.getAttribute('data-ymdt') as string;
-                const time = new Date(
-                    Number(ts.substr(0,4)),
-                    Number(ts.substr(4,2)), 
-                    Number(ts.substr(6,2)),
-                    Number(ts.substr(8,2)),
-                    0,0,0);
+                const dateTime = e.getAttribute('data-ymdt') as string;
+                const time = naverService.parseTime(dateTime)
 
                 return {
                     temperature: { degrees: degrees, type: scale.C },
@@ -220,6 +218,94 @@ export class naverService implements locationService, weatherService {
                 }
             });
     }
+
+
+    /**
+     * Parse the rain forecasts from the main weather page.
+     *
+     * @private
+     * @static
+     * @param {Document} weatherDoc
+     * @return {*}  {rainForecast[]}
+     * @memberof naverService
+     */
+    private static parseRainForecasts(weatherDoc: Document): rainForecast[] {
+
+        const rainSection = weatherDoc.querySelector('div[data-nclk="wtk.rainhrscr"]');
+
+        const percentages = rainSection?.
+            querySelector('tr.row_icon')?.
+            querySelectorAll('td.data');
+
+        const amounts = rainSection?.
+            querySelector('tr.row_graph.row_rain')?.
+            querySelectorAll('td.data');
+
+        if (percentages === undefined 
+            || amounts === undefined
+            || percentages.length != amounts.length) {
+            return [];
+        }
+
+        const rainForecasts: rainForecast[] = [];
+        for (let i = 0; i < percentages.length; i++) {
+            const percentage = percentages[i];
+            const amount = amounts[i];
+
+            rainForecasts.push(
+                {
+                    percentChance: Number(percentage.querySelector('em.value')?.textContent),
+                    amount: Number(amount.querySelector('div.data_inner')?.textContent),
+                    time: naverService.parseTime(percentage.getAttribute('data-ymdt') as string)
+                }
+            );
+        }
+
+        return rainForecasts;
+    }
+
+
+    /**
+     * Parse the humidity forecasts from the main weather page.
+     *
+     * @private
+     * @static
+     * @param {Document} weatherDoc
+     * @return {*}  {humidityForecast[]}
+     * @memberof naverService
+     */
+    private static parseHumidityForecasts(weatherDoc: Document): humidityForecast[] {
+        throw new Error("Method not implemented.");
+    }
+
+    /**
+     * Parse the wind forecasts from the main weather page.
+     *
+     * @private
+     * @static
+     * @param {Document} weatherDoc
+     * @return {*}  {windForecast[]}
+     * @memberof naverService
+     */
+    private static parseWindForecasts(weatherDoc: Document): windForecast[] {
+        throw new Error("Method not implemented.");
+    }
+
+    /**
+     * Parse a date from a date time string in the main weather page.
+     *
+     * @private
+     * @static
+     * @param {string} dateTime
+     * @return {*}  {Date}
+     * @memberof naverService
+     */
+    private static parseTime(dateTime: string): Date {
+        return new Date(
+            Number(dateTime.substr(0, 4)),
+            Number(dateTime.substr(4, 2)) - 1,
+            Number(dateTime.substr(6, 2)),
+            Number(dateTime.substr(8, 2)),
+            0, 0, 0);
+    }
 }
-
-
