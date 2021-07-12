@@ -14,7 +14,7 @@ class fakeWeatherService implements weatherService {
             humidityForecasts: this.generateHumidityForecasts(),
             microDust: 'good',
             rainAmount: Math.ceil(Math.random() * 5),
-            rainForecasts: [],
+            rainForecasts: this.generateRainForecasts(),
             temperature: { degrees: Math.ceil((Math.random() * 10) + 20), type: scale.F },
             weatherForecasts: this.generateWeatherForecasts(),
             windDirection: 'north west',
@@ -47,6 +47,20 @@ class fakeWeatherService implements weatherService {
         }
         return forecasts;
     }
+
+    generateRainForecasts = (): rainForecast[] => {
+
+        const forecasts: rainForecast[] = [];
+        for (let i = 0; i < 70; i++) {
+            forecasts.push({
+                amount: Math.ceil(Math.random() * 25),
+                percentChance: Math.ceil(Math.random() * 100),
+                time: new Date()
+            });
+        }
+        return forecasts;
+    }
+    
 }
 
 export interface weather {
