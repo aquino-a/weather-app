@@ -11,13 +11,14 @@ import WeatherForecast from './WeatherForecast';
 import WindForecast from './WindForecast';
 
 
+
 /**
  * The parent component of all weather child components.
  *
- * @param {weatherProps} props
+ * @param {{ location: location }} props
  * @return {*} 
  */
-const Weather = (props: weatherProps) => {
+const Weather = (props: { location: location }) => {
 
     const { location } = props;
 
@@ -56,14 +57,6 @@ const Weather = (props: weatherProps) => {
             <WindForecast weather={weather} />
         </View>
     );
-}
-
-export interface weatherProps {
-    location: location | null;
-}
-
-export interface weatherChildProps {
-    weather: weather | null;
 }
 
 

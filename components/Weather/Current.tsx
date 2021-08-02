@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 
-import { weatherChildProps } from './Weather';
+import { weather } from '../../service/weatherService';
+
 
 
 /**
  * A component that displays the current weather data.
  *
- * @param {weatherChildProps} props
+ * @param {{ weather: weather }} props
  * @return {*} 
  */
-const Current = (props: weatherChildProps) => {
+const Current = (props: { weather: weather }) => {
 
     const { weather } = props;
 

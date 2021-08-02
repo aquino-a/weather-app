@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { ListRenderItem, View, Text, FlatList, StyleSheet } from 'react-native';
 
-import { weatherForecast } from '../../service/weatherService';
-import { weatherChildProps } from './Weather';
+import { weather, weatherForecast } from '../../service/weatherService';
+
 
 
 /**
  * A component that displays the weather forecasts.
  *
- * @param {weatherChildProps} props
+ * @param {{ weather: weather }} props
  * @return {*} 
  */
-const WeatherForecast = (props: weatherChildProps) => {
+const WeatherForecast = (props: { weather: weather }) => {
 
     const { weatherForecasts } = props.weather!;
 
