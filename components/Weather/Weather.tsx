@@ -61,7 +61,8 @@ const Weather = (props: { location: location }) => {
 
 export const childStyles = StyleSheet.create({
     container: {
-        width: '100%'
+        flex: 1,
+        maxWidth: 400
     },
 });
 
