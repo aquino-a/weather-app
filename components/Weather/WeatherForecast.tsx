@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ListRenderItem, View, Text, FlatList, StyleSheet } from 'react-native';
 
 import { weather, weatherForecast } from '../../service/weatherService';
-
+import { childStyles } from './Weather';
 
 
 /**
@@ -26,12 +26,12 @@ const WeatherForecast = (props: { weather: weather }) => {
     }
 
     return (
-        <View>
+        <View style={childStyles.container}>
             <Text>
                 Weather:
             </Text>
             <FlatList
-                style={styles.list}
+                // style={styles.list}
                 data={weatherForecasts}
                 renderItem={renderWeather}
                 keyExtractor={(weather, index) => weather.time.getTime().toString() + index}
@@ -40,11 +40,5 @@ const WeatherForecast = (props: { weather: weather }) => {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    list: {
-        width: 250
-    },
-});
 
 export default WeatherForecast;

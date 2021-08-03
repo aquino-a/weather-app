@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ListRenderItem, View, Text, FlatList, StyleSheet } from 'react-native';
 
 import { rainForecast, weather } from '../../service/weatherService';
+import { childStyles } from './Weather';
 
 
 
@@ -25,12 +26,12 @@ const RainForecast = (props: { weather: weather }) => {
     }
 
     return (
-        <View>
+        <View style={childStyles.container}>
             <Text>
                 Rain:
             </Text>
             <FlatList
-                style={styles.list}
+                // style={styles.list}
                 data={rainForecasts}
                 renderItem={renderRain}
                 keyExtractor={(rain, index) => rain.time.getTime().toString() + index}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 
 import { location } from '../../service/locationService';
 import weatherService, { weather } from '../../service/weatherService';
@@ -59,5 +59,10 @@ const Weather = (props: { location: location }) => {
     );
 }
 
+export const childStyles = StyleSheet.create({
+    container: {
+        width: '100%'
+    },
+});
 
 export default Weather;
