@@ -64,7 +64,7 @@ const Location = (props: { onLocationChange: ((location: location) => void) }) =
         <View>
             <View >
                 <Modal
-                    style={styles.locationSelect}
+                    // style={styles.locationSelect}
                     animationType="fade"
                     transparent={true}
                     visible={modalVisible}
@@ -72,10 +72,10 @@ const Location = (props: { onLocationChange: ((location: location) => void) }) =
                         setModalVisible(!modalVisible);
                     }}
                 >
-                    <View >
-                        <View >
+                    <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
                             <TextInput
-                                // style={styles.input}
+                                style={styles.locationInput}
                                 onChangeText={onSearchChange}
                                 value={searchValue}
                                 placeholder="Location"
@@ -91,21 +91,31 @@ const Location = (props: { onLocationChange: ((location: location) => void) }) =
                 </Modal>
             </View>
             <Pressable
-                onPress={() => setModalVisible(true)}
+                onPress={() => {console.log("location clicked"); setModalVisible(true);}}
             >
-                <Text>{currentLocation.name}</Text>
+                <View style={styles.locationView}>
+                    <Text>{currentLocation.name}</Text>
+                </View>
             </Pressable>
         </View>
     );
 };
 
 
-
-
-
-
 const styles = StyleSheet.create({
-    locationSelect: {
+    locationView: {
+        borderRadius: 13,
+        backgroundColor: '#fafbee',
+        paddingHorizontal: 55,
+        paddingVertical: 7,
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 10
+      },
+      modalView: {
         margin: 20,
         backgroundColor: "white",
         borderRadius: 20,
@@ -113,10 +123,17 @@ const styles = StyleSheet.create({
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: {
-            width: 0,
-            height: 2
+          width: 0,
+          height: 2
         },
-    }
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+      },
+      locationInput: {
+          padding: 5,
+          fontSize: 30
+      }
 });
 
 
