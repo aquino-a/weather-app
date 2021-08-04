@@ -1,7 +1,7 @@
 import { parse } from 'node-html-parser';
 
 import { location } from '../locationService';
-import { naverService } from '../naverService';
+import naverServiceInstance, { naverService } from '../naverService';
 import { temperature, weather } from '../weatherService';
 
 // const jsdom = require("jsdom");
@@ -37,7 +37,7 @@ test('search 봉천동', async () => {
 
   });
 
-  test('parse weather', async () => {
+  test('parse static weather page', async () => {
     const rawHtml = fs.readFileSync('./service/test/weather-parse-test.html')
     const weatherDoc = parse(rawHtml);
 
@@ -85,4 +85,52 @@ test('search 봉천동', async () => {
     expect(
         parsedWeather.windSpeed)
         .toBe<number>(1);
+  });
+
+  test('parse live weather page', async () => {
+
+    var parsedWeather = await naverServiceInstance.searchWeather("09170130");
+
+    expect(
+        parsedWeather.condition)
+        .not.toBeNull();
+    expect(
+        parsedWeather.dust)
+        .not.toBeNull();
+    expect(
+        parsedWeather.condition)
+        .not.toBeNull();
+    expect(
+        parsedWeather.feel)
+        .not.toBeNull();
+    expect(
+        parsedWeather.humidity)
+        .toBeGreaterThan(0)
+    expect(
+        parsedWeather.humidityForecasts.length)
+        .toBeGreaterThan(0)
+    expect(
+        parsedWeather.microDust)
+        .not.toBeNull();
+    expect(
+        parsedWeather.rainAmount)
+        .toBeGreaterThan(0)
+    expect(
+        parsedWeather.rainForecasts.length)
+        .toBeGreaterThan(0)
+    expect(
+        parsedWeather.temperature)
+        .not.toBeNull();
+    expect(
+        parsedWeather.weatherForecasts.length)
+        .toBeGreaterThan(0)
+    expect(
+        parsedWeather.windDirection)
+        .toBe<string>('북북동풍');
+    expect(
+        parsedWeather.windForecasts.length)
+        .toBeGreaterThan(0)
+    expect(
+        parsedWeather.windSpeed)
+        .toBeGreaterThan(0)
   });

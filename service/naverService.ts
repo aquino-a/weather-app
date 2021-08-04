@@ -142,12 +142,12 @@ export class naverService implements locationService, weatherService {
         const list = weatherArea.querySelector('.summary_list')!
             .childNodes
             .filter(n => n instanceof HTMLElement);
-
+            
         return {
-            humidity: Number(naverService.PERCENT_REGEX.exec(list[1].textContent)[1]),
-            windDirection: list[2].textContent,
-            windSpeed: Number(naverService.SPEED_REGEX.exec(list[3].textContent)[1]),
-            feel: { degrees: Number(naverService.TEMPERATURE_REGEX.exec(list[5].textContent)[1]), type: scale.C }
+            humidity: Number(naverService.PERCENT_REGEX.exec(list[3].textContent)[1]),
+            windDirection: list[4].textContent,
+            windSpeed: Number(naverService.SPEED_REGEX.exec(list[5].textContent)[1]),
+            feel: { degrees: Number(naverService.TEMPERATURE_REGEX.exec(list[7].textContent)[1]), type: scale.C }
         };
     }
 
@@ -162,8 +162,14 @@ export class naverService implements locationService, weatherService {
      */
     private static parseRain(weatherArea: HTMLElement): number {
 
-        const rainAmount = weatherArea
-            .querySelector('.summary_rainfall')
+        const rainArea = weatherArea
+            .querySelector('.summary_rainfall');
+
+        if (rainArea === undefined || rainArea === null) {
+            return 0;
+        }
+
+        const rainAmount = rainArea
             .querySelector('strong').textContent;
 
         return Number(naverService.RAIN_REGEX.exec(rainAmount)[1])
@@ -174,7 +180,7 @@ export class naverService implements locationService, weatherService {
      *
      * @private
      * @static
-     * @param {Document} weatherDoc
+     * @param {HTMLElement} weatherDoc
      * @return {*}  {*}
      * @memberof naverService
      */
@@ -196,7 +202,7 @@ export class naverService implements locationService, weatherService {
      *
      * @private
      * @static
-     * @param {Document} weatherDoc
+     * @param {HTMLElement} weatherDoc
      * @return {*}  {weatherForecast[]}
      * @memberof naverService
      */
@@ -228,7 +234,7 @@ export class naverService implements locationService, weatherService {
      *
      * @private
      * @static
-     * @param {Document} weatherDoc
+     * @param {HTMLElement} weatherDoc
      * @return {*}  {rainForecast[]}
      * @memberof naverService
      */
@@ -273,7 +279,7 @@ export class naverService implements locationService, weatherService {
      *
      * @private
      * @static
-     * @param {Document} weatherDoc
+     * @param {HTMLElement} weatherDoc
      * @return {*}  {humidityForecast[]}
      * @memberof naverService
      */
