@@ -59,6 +59,12 @@ const Weather = (props: { location: location }) => {
     );
 }
 
+const styles = StyleSheet.create({
+    mainView: {
+        flex: 1
+    }
+});
+
 export const childStyles = StyleSheet.create({
     container: {
         flex: 1,
