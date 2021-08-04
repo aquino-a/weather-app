@@ -142,12 +142,14 @@ export class naverService implements locationService, weatherService {
         const list = weatherArea.querySelector('.summary_list')!
             .childNodes
             .filter(n => n instanceof HTMLElement);
-            
+
+        const start = list.findIndex(n => n.textContent === '습도'); //-1 or the index
+
         return {
-            humidity: Number(naverService.PERCENT_REGEX.exec(list[3].textContent)[1]),
-            windDirection: list[4].textContent,
-            windSpeed: Number(naverService.SPEED_REGEX.exec(list[5].textContent)[1]),
-            feel: { degrees: Number(naverService.TEMPERATURE_REGEX.exec(list[7].textContent)[1]), type: scale.C }
+            humidity: Number(naverService.PERCENT_REGEX.exec(list[start + 1].textContent)[1]),
+            windDirection: list[start + 2].textContent,
+            windSpeed: Number(naverService.SPEED_REGEX.exec(list[start + 3].textContent)[1]),
+            feel: { degrees: Number(naverService.TEMPERATURE_REGEX.exec(list[start + 5].textContent)[1]), type: scale.C }
         };
     }
 
