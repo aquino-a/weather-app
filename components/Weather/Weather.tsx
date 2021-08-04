@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
+import { weatherServiceInstance as weatherService } from '../../service/serviceFactory';
 import { location } from '../../service/locationService';
-import weatherService, { weather } from '../../service/weatherService';
+import { weather } from '../../service/weatherService';
 
 import Current from './Current';
 import HumidityForecast from './HumidityForecast';

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, Alert, Pressable, StyleSheet, TextInput, FlatList, ListRenderItem } from "react-native";
 
-import locationService, { location, defaultLocation, locationKey } from '../service/locationService';
+import { locationServiceInstance as locationService } from '../service/serviceFactory';
+import { location, defaultLocation, locationKey } from '../service/locationService';
 import { getValue, storeValue } from '../service/storageService';
 
 /**

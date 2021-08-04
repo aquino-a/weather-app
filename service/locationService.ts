@@ -13,7 +13,7 @@ export interface locationService {
     searchLocation(query: string): Promise<location[]>;
 }
 
-class fakeLocationService implements locationService {
+export default class fakeLocationService implements locationService {
 
     async searchLocation(query: string): Promise<location[]> {
         return Promise.resolve([
@@ -23,8 +23,4 @@ class fakeLocationService implements locationService {
         ]);
     }
 }
-
-const fakeService: locationService = new fakeLocationService();
-
-export default naver;
 
