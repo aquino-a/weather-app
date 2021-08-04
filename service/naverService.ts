@@ -353,3 +353,7 @@ export class naverService implements locationService, weatherService {
             0, 0, 0);
     }
 }
+
+const naverServiceInstance = new naverService();
+
+export default naverServiceInstance;

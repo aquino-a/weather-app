@@ -1,3 +1,5 @@
+import naver from "./naverService";
+
 export interface location {
     name: string,
     code: string
@@ -24,5 +26,5 @@ class fakeLocationService implements locationService {
 
 const fakeService: locationService = new fakeLocationService();
 
-export default fakeService;
+export default naver;
 
