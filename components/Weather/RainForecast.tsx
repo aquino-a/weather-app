@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { ListRenderItem, View, Text, FlatList, StyleSheet } from 'react-native';
 
 import { rainForecast, weather } from '../../service/weatherService';
-import { childStyles } from './Weather';
 
 
 
@@ -26,7 +25,7 @@ const RainForecast = (props: { weather: weather }) => {
     }
 
     return (
-        <View style={childStyles.container}>
+        <View>
             <Text>
                 Rain:
             </Text>

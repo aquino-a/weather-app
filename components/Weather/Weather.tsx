@@ -52,10 +52,18 @@ const Weather = (props: { location: location }) => {
     return (
         <View>
             <Current weather={weather} />
-            <WeatherForecast weather={weather} />
-            <HumidityForecast weather={weather} />
-            <RainForecast weather={weather} />
-            <WindForecast weather={weather} />
+            <View style={styles.childContainer}>
+                <WeatherForecast weather={weather} />
+            </View>
+            <View style={styles.childContainer}>
+                <HumidityForecast weather={weather} />
+            </View>
+            <View style={styles.childContainer}>
+                <RainForecast weather={weather} />
+            </View>
+            <View style={styles.childContainer}>
+                <WindForecast weather={weather} />
+            </View>
         </View>
     );
 }
@@ -63,11 +71,8 @@ const Weather = (props: { location: location }) => {
 const styles = StyleSheet.create({
     mainView: {
         flex: 1
-    }
-});
-
-export const childStyles = StyleSheet.create({
-    container: {
+    },
+    childContainer: {
         flex: 1,
         maxWidth: 400
     },
