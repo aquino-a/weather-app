@@ -1,5 +1,8 @@
 import { ScaledSize } from "react-native";
 
+import naver from "./naverService";
+
+
 export interface weatherService {
     searchWeather(locationCode: string): Promise<weather>;
 }
@@ -129,4 +132,4 @@ export interface windForecast {
 
 const fakeService: weatherService = new fakeWeatherService();
 
-export default fakeService;
+export default naver;

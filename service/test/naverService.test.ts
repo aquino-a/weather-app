@@ -1,3 +1,5 @@
+import { parse } from 'node-html-parser';
+
 import { location } from '../locationService';
 import { naverService } from '../naverService';
 import { temperature, weather } from '../weatherService';
@@ -36,8 +38,8 @@ test('search 봉천동', async () => {
   });
 
   test('parse weather', async () => {
-    const rawHtml = fs.readFileSync('./service/weather-parse-test.html')
-    const weatherDoc = new JSDOM(rawHtml).window.document;
+    const rawHtml = fs.readFileSync('./service/test/weather-parse-test.html')
+    const weatherDoc = parse(rawHtml);
 
     const parsedWeather = naverService.parseWeather(weatherDoc);
 

@@ -29,7 +29,7 @@ const Weather = (props: { location: location }) => {
             return;
         }
         weatherService.searchWeather(location!.code)
-            .then(setWeather);
+            .then(setWeather, e => console.log(e));
     }, [location]);
 
     if (!location || location.code === '') {

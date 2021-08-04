@@ -1,3 +1,5 @@
+import { HTMLElement, parse } from 'node-html-parser';
+
 import { location, locationService } from "./locationService";
 import { humidityForecast, rainForecast, scale, temperature, weather, weatherForecast, weatherService, windForecast } from "./weatherService";
 
@@ -63,9 +65,8 @@ export class naverService implements locationService, weatherService {
 
         const response = await fetch(url);
         const rawHtml = await response.text();
-        const domParser = new DOMParser();
 
-        const weatherDoc = domParser.parseFromString(rawHtml, 'text/html');
+        const weatherDoc = parse(rawHtml);
 
         return naverService.parseWeather(weatherDoc);
     }
@@ -78,13 +79,13 @@ export class naverService implements locationService, weatherService {
      * @return {*}  {(weather)} the weather data from the web page.
      * @memberof naverService
      */
-    static parseWeather(weatherDoc: Document): weather {
+    static parseWeather(weatherDoc: HTMLElement): weather {
 
         // weather_area
-        const weatherArea = weatherDoc.getElementsByClassName('weather_area')[0] as HTMLElement;
+        const weatherArea = weatherDoc.querySelector('.weather_area') as HTMLElement;
         const currentTemperature = naverService.parseTemperature(weatherArea);
         const listDetails = naverService.parseListDetails(weatherArea);
-        const currentCondition = weatherArea.getElementsByClassName('weather')[0].textContent as string;
+        const currentCondition = weatherArea.querySelector('.weather')!.textContent as string;
         const rainAmount = naverService.parseRain(weatherArea);
         const dust = naverService.parseDust(weatherDoc);
 
@@ -120,9 +121,9 @@ export class naverService implements locationService, weatherService {
      * @return {*}  {temperature}
      * @memberof naverService
      */
-    private static parseTemperature(weatherArea: Element): temperature {
+    private static parseTemperature(weatherArea: HTMLElement): temperature {
 
-        const line = weatherArea.getElementsByClassName('current')[0].textContent;
+        const line = weatherArea.querySelector('.current')!.textContent;
 
         return { degrees: Number(naverService.TEMPERATURE_REGEX.exec(line)[1]), type: scale.C };
     }
@@ -136,15 +137,17 @@ export class naverService implements locationService, weatherService {
      * @return {*}  {*}
      * @memberof naverService
      */
-    private static parseListDetails(weatherArea: Element): any {
+    private static parseListDetails(weatherArea: HTMLElement): any {
 
-        const list = weatherArea.getElementsByClassName('summary_list')[0];
+        const list = weatherArea.querySelector('.summary_list')!
+            .childNodes
+            .filter(n => n instanceof HTMLElement);
 
         return {
-            humidity: Number(naverService.PERCENT_REGEX.exec(list.children[1].textContent)[1]),
-            windDirection: list.children[2].textContent,
-            windSpeed: Number(naverService.SPEED_REGEX.exec(list.children[3].textContent)[1]),
-            feel: { degrees: Number(naverService.TEMPERATURE_REGEX.exec(list.children[5].textContent)[1]), type: scale.C }
+            humidity: Number(naverService.PERCENT_REGEX.exec(list[1].textContent)[1]),
+            windDirection: list[2].textContent,
+            windSpeed: Number(naverService.SPEED_REGEX.exec(list[3].textContent)[1]),
+            feel: { degrees: Number(naverService.TEMPERATURE_REGEX.exec(list[5].textContent)[1]), type: scale.C }
         };
     }
 
@@ -160,8 +163,8 @@ export class naverService implements locationService, weatherService {
     private static parseRain(weatherArea: HTMLElement): number {
 
         const rainAmount = weatherArea
-            .getElementsByClassName('summary_rainfall')[0]
-            .getElementsByTagName('strong')[0].textContent;
+            .querySelector('.summary_rainfall')
+            .querySelector('strong').textContent;
 
         return Number(naverService.RAIN_REGEX.exec(rainAmount)[1])
     }
@@ -175,11 +178,11 @@ export class naverService implements locationService, weatherService {
      * @return {*}  {*}
      * @memberof naverService
      */
-    private static parseDust(weatherDoc: Document): any {
+    private static parseDust(weatherDoc: HTMLElement): any {
 
         const list = weatherDoc
-            .getElementsByClassName('today_chart_list')[0]
-            .getElementsByClassName('level_text');
+            .querySelector('.today_chart_list')
+            .querySelectorAll('.level_text');
 
         return {
             dust: list[0].textContent,
@@ -197,25 +200,26 @@ export class naverService implements locationService, weatherService {
      * @return {*}  {weatherForecast[]}
      * @memberof naverService
      */
-    private static parseWeatherForecasts(weatherDoc: Document): weatherForecast[] {
-        return Array.from(
-            weatherDoc
-                .getElementsByClassName('time_list align_left')[0]
-                .children)
-            .map((e: Element): weatherForecast => {
+    private static parseWeatherForecasts(weatherDoc: HTMLElement): weatherForecast[] {
+        return weatherDoc
+                .querySelector('.time_list.align_left')
+                .childNodes
+                .filter(n => n instanceof HTMLElement)
+                .map(n => n as HTMLElement)
+                .map((e: HTMLElement): weatherForecast => {
 
-                const degrees = Number(e.getAttribute('data-tmpr'));
-                const condition = e.getAttribute('data-wetr-txt') as string;
+                    const degrees = Number(e.getAttribute('data-tmpr'));
+                    const condition = e.getAttribute('data-wetr-txt') as string;
 
-                const dateTime = e.getAttribute('data-ymdt') as string;
-                const time = naverService.parseTime(dateTime)
+                    const dateTime = e.getAttribute('data-ymdt') as string;
+                    const time = naverService.parseTime(dateTime)
 
-                return {
-                    temperature: { degrees: degrees, type: scale.C },
-                    condition: condition,
-                    time: time,
-                }
-            });
+                    return {
+                        temperature: { degrees: degrees, type: scale.C },
+                        condition: condition,
+                        time: time,
+                    }
+                });
     }
 
 
@@ -228,7 +232,7 @@ export class naverService implements locationService, weatherService {
      * @return {*}  {rainForecast[]}
      * @memberof naverService
      */
-    private static parseRainForecasts(weatherDoc: Document): rainForecast[] {
+    private static parseRainForecasts(weatherDoc: HTMLElement): rainForecast[] {
 
         const rainSection = weatherDoc.querySelector('div[data-nclk="wtk.rainhrscr"]');
 
@@ -273,7 +277,7 @@ export class naverService implements locationService, weatherService {
      * @return {*}  {humidityForecast[]}
      * @memberof naverService
      */
-    private static parseHumidityForecasts(weatherDoc: Document): humidityForecast[] {
+    private static parseHumidityForecasts(weatherDoc: HTMLElement): humidityForecast[] {
 
         const humiditySection = weatherDoc.querySelector('div[data-nclk="wtk.humihrscr"]');
 
@@ -300,7 +304,7 @@ export class naverService implements locationService, weatherService {
      * @return {*}  {windForecast[]}
      * @memberof naverService
      */
-    private static parseWindForecasts(weatherDoc: Document): windForecast[] {
+    private static parseWindForecasts(weatherDoc: HTMLElement): windForecast[] {
 
         const windSection = weatherDoc.querySelector('div[data-nclk="wtk.windhrscr"]');
 
