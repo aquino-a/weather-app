@@ -30,7 +30,11 @@ const Weather = (props: { location: location }) => {
             return;
         }
         weatherService.searchWeather(location!.code)
-            .then(setWeather, e => console.log(e));
+            .then(setWeather)
+            .catch(e => {
+                console.log("weather result in wrong format");
+                console.log(e);
+            });
     }, [location]);
 
     if (!location || location.code === '') {
