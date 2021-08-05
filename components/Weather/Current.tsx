@@ -15,6 +15,20 @@ const Current = (props: { weather: weather }) => {
 
     const { weather } = props;
 
+    const dustStyle = (dust: string) => {
+        switch (dust) {
+            case '좋음':
+                return goodDust;
+            case '보통':
+                return okDust;
+            case '높음':
+                return badDust;
+            case '매우높음':
+            default:
+                return veryBadDust;
+        }
+    }
+
     return (
         <View style={styles.currentView}>
             <View style={styles.temperature}>
@@ -34,13 +48,17 @@ const Current = (props: { weather: weather }) => {
                 <Text style={styles.miscDetailsData}>{weather!.feel.degrees}°</Text>
             </View>
             <View style={styles.dust}>
-                <View style={styles.dustBox}>
+                <View style={[styles.dustBox, dustStyle(weather.dust).dustBox]}>
                     <Text>Dust</Text>
-                    <Text style={styles.dustData}>{weather!.dust}</Text>
+                    <Text style={[styles.dustData, dustStyle(weather.dust).dustData]}>
+                        {weather!.dust}
+                    </Text>
                 </View>
-                <View style={styles.dustBox}>
+                <View style={[styles.dustBox, dustStyle(weather.microDust).dustBox]}>
                     <Text>Micro Dust</Text>
-                    <Text style={styles.dustData}>{weather!.microDust}</Text>
+                    <Text style={[styles.dustData, dustStyle(weather.microDust).dustData]}>
+                        {weather!.microDust}
+                    </Text>
                 </View>
             </View>
         </View>
@@ -110,6 +128,39 @@ const styles = StyleSheet.create({
         padding: 2,
     }
 
+});
+
+const goodDust = StyleSheet.create({
+    dustBox: {
+        backgroundColor: '#eef6fb',
+    },
+    dustData: {
+        color: '#32a1ff',
+    },
+});
+const okDust = StyleSheet.create({
+    dustBox: {
+        backgroundColor: '#eef9ec',
+    },
+    dustData: {
+        color: '#00c73c',
+    },
+});
+const badDust = StyleSheet.create({
+    dustBox: {
+        backgroundColor: '#fdfbef',
+    },
+    dustData: {
+        color: '#fda915',
+    },
+});
+const veryBadDust = StyleSheet.create({
+    dustBox: {
+        backgroundColor: '#faf6ec',
+    },
+    dustData: {
+        color: '#f70',
+    },
 });
 
 
