@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 
 import { weatherServiceInstance as weatherService } from '../../service/serviceFactory';
 import { location } from '../../service/locationService';
@@ -34,6 +34,7 @@ const Weather = (props: { location: location }) => {
             .catch(e => {
                 console.log("weather result in wrong format");
                 console.log(e);
+                Alert.alert("Data unavailable.", "Choose different location.")
             });
     }, [location]);
 
