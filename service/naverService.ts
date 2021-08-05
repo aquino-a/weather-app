@@ -48,6 +48,13 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     parseLocations = (rawObject: any): location[] => {
+
+        if (rawObject === undefined || rawObject === null 
+            || rawObject.items === undefined || rawObject.items === null 
+            || rawObject.items.length === 0) {
+            return [];
+        }
+        
         return rawObject.items[0]
             .map((a: string[][]) => ({ name: a[0][0], code: a[1][0] }));
     }
