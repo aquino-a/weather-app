@@ -1,9 +1,14 @@
 
 export interface weatherService {
     searchWeather(locationCode: string): Promise<weather>;
+    setWeatherSource(locationCode: string, source: weatherSource): Promise<void>;
 }
 
 export default class fakeWeatherService implements weatherService {
+    setWeatherSource(locationCode: string, source: weatherSource): Promise<void> {
+        return Promise.resolve();
+    }
+
     searchWeather(locationCode: string): Promise<weather> {
         return Promise.resolve({
             condition: 'condition',
@@ -100,6 +105,10 @@ export interface temperature {
 
 export enum scale {
     C, F
+}
+
+export enum weatherSource {
+    ACCUWEATHER, KMA, TWC
 }
 
 export interface weatherForecast {

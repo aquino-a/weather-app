@@ -1,7 +1,7 @@
 import { HTMLElement, parse } from 'node-html-parser';
 
 import { location, locationService } from "./locationService";
-import { humidityForecast, rainForecast, scale, temperature, weather, weatherForecast, weatherService, windForecast } from "./weatherService";
+import { humidityForecast, rainForecast, scale, temperature, weather, weatherForecast, weatherService, weatherSource, windForecast } from "./weatherService";
 
 /**
  * A service that communicates with the naver api.
@@ -17,6 +17,10 @@ export class naverService implements locationService, weatherService {
     static readonly PERCENT_REGEX: RegExp = new RegExp('(\\d+)%');
     static readonly SPEED_REGEX: RegExp = new RegExp('(\\d+) *m/s');
     static readonly RAIN_REGEX: RegExp = new RegExp('(\\d+(?:\\.\\d+)?) *mm');
+    static readonly COOKIE_REGEX: RegExp = new RegExp('[A-Z\\d_]+="?[A-Za-z\\d]*=?"?', 'g');
+
+    private cookie: string;
+
 
     /**
      * Searchs the naver api for the location name and location code using a text query.
@@ -68,14 +72,50 @@ export class naverService implements locationService, weatherService {
      */
     async searchWeather(locationCode: string): Promise<weather> {
 
-        const url = new URL(`https://${naverService.NAVER_BASE_URL}/today/${locationCode}`);
+        const url = new URL(`https://${naverService.NAVER_BASE_URL}/today/${locationCode}?cpName=ACCUWEATHER`);
 
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            headers: {
+                'cookie': this.cookie
+            },
+        });
+
+        const setCookie = response.headers.get('set-cookie')!;
+        const matches = setCookie.match(naverService.COOKIE_REGEX);
+        this.cookie = matches?.join('; ')!;
+        
         const rawHtml = await response.text();
-
         const weatherDoc = parse(rawHtml);
 
         return naverService.parseWeather(weatherDoc);
+    }
+
+    /**
+     * Set the source type for weather data.
+     * Sends post request to naver with the weather source type.
+     *
+     * @param {weatherSource} source
+     * @return {*}  {Promise<void>}
+     * @memberof naverService
+     */
+    async setWeatherSource(locationCode: string, source: weatherSource): Promise<void> {
+
+        const url = new URL(`https://${naverService.NAVER_BASE_URL}/today/api/follow`);
+        const data = {
+            regionCode: locationCode,
+            cpName: source.toString()
+        };
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'cookie': this.cookie,
+                'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            },
+            body: JSON.stringify(data)
+        });
+
+        console.log(response.status);
     }
 
     /**

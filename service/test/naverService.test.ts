@@ -2,7 +2,7 @@ import { parse } from 'node-html-parser';
 
 import { location } from '../locationService';
 import naverServiceInstance, { naverService } from '../naverService';
-import { temperature, weather } from '../weatherService';
+import { temperature, weather, weatherSource } from '../weatherService';
 
 // const jsdom = require("jsdom");
 const { JSDOM } = require("jsdom");
@@ -137,3 +137,14 @@ test('search 봉천동', async () => {
         parsedWeather.windSpeed)
         .toBeGreaterThan(0)
   });
+
+  
+  test('set weather source', async () => {
+
+    var parsedWeather = await naverServiceInstance.searchWeather("09170130");
+
+    await naverServiceInstance.setWeatherSource("09170130", weatherSource.ACCUWEATHER);
+    var newParsedWeather = await naverServiceInstance.searchWeather("09170130");
+
+    console.log(JSON.stringify(parsedWeather));
+    });
