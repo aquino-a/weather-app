@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 
 import Location from './components/Location';
@@ -27,7 +26,6 @@ export default function App() {
     <View style={styles.container}>
       <Location onLocationChange={onLocationChange} />
       <Weather location={currentLocation} />
-      <StatusBar style="auto" />
     </View>
   );
 }
