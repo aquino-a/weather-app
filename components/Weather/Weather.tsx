@@ -29,12 +29,13 @@ const Weather = (props: { location: location }) => {
         if (!location || location.code === '') {
             return;
         }
-        weatherService.searchWeather(location!.code)
+        weatherService
+            .searchWeather(location!.code)
             .then(setWeather)
             .catch(e => {
-                console.log("weather result in wrong format");
+                console.log('weather result in wrong format');
                 console.log(e);
-                Alert.alert("Data unavailable.", "Choose different location.")
+                Alert.alert('Data unavailable.', 'Choose different location.');
             });
     }, [location]);
 
@@ -60,7 +61,7 @@ const Weather = (props: { location: location }) => {
             <View style={styles.childContainer}>
                 <WeatherForecast weather={weather} />
             </View>
-            <View style={styles.childContainer}>
+            {/* <View style={styles.childContainer}>
                 <HumidityForecast weather={weather} />
             </View>
             <View style={styles.childContainer}>
@@ -68,18 +69,21 @@ const Weather = (props: { location: location }) => {
             </View>
             <View style={styles.childContainer}>
                 <WindForecast weather={weather} />
-            </View>
+            </View> */}
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     mainView: {
-        flex: 1
+        flex: 1,
     },
     childContainer: {
         flex: 1,
-        maxWidth: 400
+        maxWidth: 400,
+    },
+    current: {
+        flex: 1,
     },
 });
 
