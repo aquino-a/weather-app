@@ -30,6 +30,11 @@ export class naverService implements locationService, weatherService {
         '[A-Z\\d_]+="?[A-Za-z\\d]*=?"?',
         'g',
     );
+    static readonly HIDDEN_DATA_REGEX: RegExp = new RegExp(
+        'var townFcastListJson = (\\[[^]+\\]);',
+        'gm',
+    );
+    static readonly NEW_LINE_REGEX: RegExp = new RegExp('\\r?\\n|\\r', 'gm');
 
     private cookie: string;
 
@@ -152,7 +157,7 @@ export class naverService implements locationService, weatherService {
         const weatherArea = weatherDoc.querySelector(
             '.weather_area',
         ) as HTMLElement;
-        
+
         const currentTemperature = naverService.parseTemperature(weatherArea);
         const listDetails = naverService.parseListDetails(weatherArea);
         const currentCondition = weatherArea.querySelector('.weather')!
@@ -162,10 +167,11 @@ export class naverService implements locationService, weatherService {
 
         //forecasts
         const weatherForecasts = naverService.parseWeatherForecasts(weatherDoc);
-        const rainForecasts = naverService.parseRainForecasts(weatherDoc);
-        const humidityForecasts =
-            naverService.parseHumidityForecasts(weatherDoc);
-        const windForecasts = naverService.parseWindForecasts(weatherDoc);
+
+        const hiddenForecasts = naverService.parseHiddenForecasts(weatherDoc);
+        const rainForecasts = hiddenForecasts.rainForecasts;
+        const humidityForecasts = hiddenForecasts.humidityForecasts;
+        const windForecasts = hiddenForecasts.windForecasts;
 
         return {
             temperature: currentTemperature,
@@ -307,6 +313,60 @@ export class naverService implements locationService, weatherService {
                     time: time,
                 };
             });
+    }
+
+    /**
+     * Finds the hidden weather data js object in the web page
+     * and parses the data.
+     *
+     * @static
+     * @param {HTMLElement} weatherDoc
+     * @return {*}  {{
+     *         rainForecasts: rainForecast[],
+     *         humidityForecasts: humidityForecast[],
+     *         windForecasts: windForecast[]
+     *     }}
+     * @memberof naverService
+     */
+    static parseHiddenForecasts(weatherDoc: HTMLElement): {
+        rainForecasts: rainForecast[];
+        humidityForecasts: humidityForecast[];
+        windForecasts: windForecast[];
+    } {
+        const scripts = weatherDoc.querySelectorAll('script');
+        const lastScriptText = scripts[scripts.length - 1].textContent;
+
+        let data;
+        try {
+            data = JSON.parse(
+                this.HIDDEN_DATA_REGEX.exec(lastScriptText)![1],
+            ) as HiddenForecast[];
+        } catch (error) {
+            console.log(`last script: ${lastScriptText}`);
+            console.log(error);
+            return {
+                rainForecasts: [],
+                humidityForecasts: [],
+                windForecasts: [],
+            };
+        }
+
+        return {
+            rainForecasts: data.map(hf => ({
+                amount: Number(hf.rainAmt),
+                percentChance: Number(hf.rainProb),
+                time: naverService.parseTime(hf.aplYmdt),
+            })),
+            humidityForecasts: data.map(hf => ({
+                humidity: Number(hf.humd),
+                time: naverService.parseTime(hf.aplYmdt),
+            })),
+            windForecasts: data.map(hf => ({
+                direction: hf.windDrctnName,
+                speed: Number(hf.windSpd),
+                time: naverService.parseTime(hf.aplYmdt),
+            })),
+        };
     }
 
     /**
@@ -460,6 +520,21 @@ export class naverService implements locationService, weatherService {
             0,
         );
     }
+}
+
+/**
+ * The interface for the hidden weather data in the web page.
+ *
+ * @interface HiddenForecast
+ */
+interface HiddenForecast {
+    aplYmdt: string;
+    rainProb: number;
+    rainAmt: number;
+    humd: number;
+    windDrctn: string;
+    windDrctnName: string;
+    windSpd: number;
 }
 
 const naverServiceInstance = new naverService();

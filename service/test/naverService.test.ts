@@ -60,23 +60,14 @@ test('parse live weather page', async () => {
     expect(parsedWeather.condition).not.toBeNull();
     expect(parsedWeather.feel).not.toBeNull();
     expect(parsedWeather.humidity).toBeGreaterThan(0);
-    // no humidity data on page response
-    // expect(
-    //     parsedWeather.humidityForecasts.length)
-    //     .toBeGreaterThan(0)
+    expect(parsedWeather.humidityForecasts.length).toBeGreaterThan(0);
     expect(parsedWeather.microDust).not.toBeNull();
     expect(parsedWeather.rainAmount).toBeGreaterThan(-1);
-    // no rain data on page response
-    // expect(
-    //     parsedWeather.rainForecasts.length)
-    //     .toBeGreaterThan(0)
+    expect(parsedWeather.rainForecasts.length).toBeGreaterThan(0);
     expect(parsedWeather.temperature).not.toBeNull();
     expect(parsedWeather.weatherForecasts.length).toBeGreaterThan(0);
     expect(parsedWeather.windDirection).not.toBeNull();
-    // no wind data on page response
-    // expect(
-    //     parsedWeather.windForecasts.length)
-    //     .toBeGreaterThan(0)
+    expect(parsedWeather.windForecasts.length).toBeGreaterThan(0);
     expect(parsedWeather.windSpeed).toBeGreaterThan(0);
 });
 
