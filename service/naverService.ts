@@ -1,7 +1,17 @@
 import { HTMLElement, parse } from 'node-html-parser';
 
-import { location, locationService } from "./locationService";
-import { humidityForecast, rainForecast, scale, temperature, weather, weatherForecast, weatherService, weatherSource, windForecast } from "./weatherService";
+import { location, locationService } from './locationService';
+import {
+    humidityForecast,
+    rainForecast,
+    scale,
+    temperature,
+    weather,
+    weatherForecast,
+    weatherService,
+    weatherSource,
+    windForecast,
+} from './weatherService';
 
 /**
  * A service that communicates with the naver api.
@@ -11,16 +21,17 @@ import { humidityForecast, rainForecast, scale, temperature, weather, weatherFor
  * @implements {locationService}
  */
 export class naverService implements locationService, weatherService {
-
-    static readonly NAVER_BASE_URL: string = "weather.naver.com";
+    static readonly NAVER_BASE_URL: string = 'weather.naver.com';
     static readonly TEMPERATURE_REGEX: RegExp = new RegExp('(\\d+)(?:°|도)');
     static readonly PERCENT_REGEX: RegExp = new RegExp('(\\d+)%');
     static readonly SPEED_REGEX: RegExp = new RegExp('(\\d+) *m/s');
     static readonly RAIN_REGEX: RegExp = new RegExp('(\\d+(?:\\.\\d+)?) *mm');
-    static readonly COOKIE_REGEX: RegExp = new RegExp('[A-Z\\d_]+="?[A-Za-z\\d]*=?"?', 'g');
+    static readonly COOKIE_REGEX: RegExp = new RegExp(
+        '[A-Z\\d_]+="?[A-Za-z\\d]*=?"?',
+        'g',
+    );
 
     private cookie: string;
-
 
     /**
      * Searchs the naver api for the location name and location code using a text query.
@@ -30,7 +41,6 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     async searchLocation(query: string): Promise<location[]> {
-
         const url = new URL(`https://ac.${naverService.NAVER_BASE_URL}/ac`);
         url.searchParams.append('q_enc', 'utf-8');
         url.searchParams.append('r_format', 'json');
@@ -52,16 +62,21 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     parseLocations = (rawObject: any): location[] => {
-
-        if (rawObject === undefined || rawObject === null 
-            || rawObject.items === undefined || rawObject.items === null 
-            || rawObject.items.length === 0) {
+        if (
+            rawObject === undefined ||
+            rawObject === null ||
+            rawObject.items === undefined ||
+            rawObject.items === null ||
+            rawObject.items.length === 0
+        ) {
             return [];
         }
-        
-        return rawObject.items[0]
-            .map((a: string[][]) => ({ name: a[0][0], code: a[1][0] }));
-    }
+
+        return rawObject.items[0].map((a: string[][]) => ({
+            name: a[0][0],
+            code: a[1][0],
+        }));
+    };
 
     /**
      * Searchs for the weather based on the location code.
@@ -71,19 +86,20 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     async searchWeather(locationCode: string): Promise<weather> {
-
-        const url = new URL(`https://${naverService.NAVER_BASE_URL}/today/${locationCode}?cpName=ACCUWEATHER`);
+        const url = new URL(
+            `https://${naverService.NAVER_BASE_URL}/today/${locationCode}?cpName=ACCUWEATHER`,
+        );
 
         const response = await fetch(url, {
             headers: {
-                'cookie': this.cookie
+                cookie: this.cookie,
             },
         });
 
         const setCookie = response.headers.get('set-cookie')!;
         const matches = setCookie.match(naverService.COOKIE_REGEX);
         this.cookie = matches?.join('; ')!;
-        
+
         const rawHtml = await response.text();
         const weatherDoc = parse(rawHtml);
 
@@ -98,21 +114,26 @@ export class naverService implements locationService, weatherService {
      * @return {*}  {Promise<void>}
      * @memberof naverService
      */
-    async setWeatherSource(locationCode: string, source: weatherSource): Promise<void> {
-
-        const url = new URL(`https://${naverService.NAVER_BASE_URL}/today/api/follow`);
+    async setWeatherSource(
+        locationCode: string,
+        source: weatherSource,
+    ): Promise<void> {
+        const url = new URL(
+            `https://${naverService.NAVER_BASE_URL}/today/api/follow`,
+        );
         const data = {
             regionCode: locationCode,
-            cpName: source.toString()
+            cpName: source.toString(),
         };
 
         const response = await fetch(url, {
             method: 'POST',
             headers: {
-                'cookie': this.cookie,
-                'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                cookie: this.cookie,
+                'content-type':
+                    'application/x-www-form-urlencoded; charset=UTF-8',
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
         });
 
         console.log(response.status);
@@ -127,19 +148,23 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     static parseWeather(weatherDoc: HTMLElement): weather {
-
         // weather_area
-        const weatherArea = weatherDoc.querySelector('.weather_area') as HTMLElement;
+        const weatherArea = weatherDoc.querySelector(
+            '.weather_area',
+        ) as HTMLElement;
+        
         const currentTemperature = naverService.parseTemperature(weatherArea);
         const listDetails = naverService.parseListDetails(weatherArea);
-        const currentCondition = weatherArea.querySelector('.weather')!.textContent as string;
+        const currentCondition = weatherArea.querySelector('.weather')!
+            .textContent as string;
         const rainAmount = naverService.parseRain(weatherArea);
         const dust = naverService.parseDust(weatherDoc);
 
         //forecasts
         const weatherForecasts = naverService.parseWeatherForecasts(weatherDoc);
         const rainForecasts = naverService.parseRainForecasts(weatherDoc);
-        const humidityForecasts = naverService.parseHumidityForecasts(weatherDoc);
+        const humidityForecasts =
+            naverService.parseHumidityForecasts(weatherDoc);
         const windForecasts = naverService.parseWindForecasts(weatherDoc);
 
         return {
@@ -155,7 +180,7 @@ export class naverService implements locationService, weatherService {
             rainForecasts: rainForecasts,
             humidityForecasts: humidityForecasts,
             windForecasts: windForecasts,
-            weatherForecasts: weatherForecasts
+            weatherForecasts: weatherForecasts,
         };
     }
 
@@ -169,10 +194,12 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     private static parseTemperature(weatherArea: HTMLElement): temperature {
-
         const line = weatherArea.querySelector('.current')!.textContent;
 
-        return { degrees: Number(naverService.TEMPERATURE_REGEX.exec(line)[1]), type: scale.C };
+        return {
+            degrees: Number(naverService.TEMPERATURE_REGEX.exec(line)[1]),
+            type: scale.C,
+        };
     }
 
     /**
@@ -185,18 +212,28 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     private static parseListDetails(weatherArea: HTMLElement): any {
-
-        const list = weatherArea.querySelector('.summary_list')!
-            .childNodes
-            .filter(n => n instanceof HTMLElement);
+        const list = weatherArea
+            .querySelector('.summary_list')!
+            .childNodes.filter(n => n instanceof HTMLElement);
 
         const start = list.findIndex(n => n.textContent === '습도'); //-1 or the index
 
         return {
-            humidity: Number(naverService.PERCENT_REGEX.exec(list[start + 1].textContent)[1]),
+            humidity: Number(
+                naverService.PERCENT_REGEX.exec(list[start + 1].textContent)[1],
+            ),
             windDirection: list[start + 2].textContent,
-            windSpeed: Number(naverService.SPEED_REGEX.exec(list[start + 3].textContent)[1]),
-            feel: { degrees: Number(naverService.TEMPERATURE_REGEX.exec(list[start + 5].textContent)[1]), type: scale.C }
+            windSpeed: Number(
+                naverService.SPEED_REGEX.exec(list[start + 3].textContent)[1],
+            ),
+            feel: {
+                degrees: Number(
+                    naverService.TEMPERATURE_REGEX.exec(
+                        list[start + 5].textContent,
+                    )[1],
+                ),
+                type: scale.C,
+            },
         };
     }
 
@@ -210,18 +247,15 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     private static parseRain(weatherArea: HTMLElement): number {
-
-        const rainArea = weatherArea
-            .querySelector('.summary_rainfall');
+        const rainArea = weatherArea.querySelector('.summary_rainfall');
 
         if (rainArea === undefined || rainArea === null) {
             return 0;
         }
 
-        const rainAmount = rainArea
-            .querySelector('strong').textContent;
+        const rainAmount = rainArea.querySelector('strong').textContent;
 
-        return Number(naverService.RAIN_REGEX.exec(rainAmount)[1])
+        return Number(naverService.RAIN_REGEX.exec(rainAmount)[1]);
     }
 
     /**
@@ -234,7 +268,6 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     private static parseDust(weatherDoc: HTMLElement): any {
-
         const list = weatherDoc
             .querySelector('.today_chart_list')
             .querySelectorAll('.level_text');
@@ -242,9 +275,8 @@ export class naverService implements locationService, weatherService {
         return {
             dust: list[0].textContent,
             microDust: list[1].textContent,
-        }
+        };
     }
-
 
     /**
      * Parse the weather forecasts from the main weather page.
@@ -255,28 +287,27 @@ export class naverService implements locationService, weatherService {
      * @return {*}  {weatherForecast[]}
      * @memberof naverService
      */
-    private static parseWeatherForecasts(weatherDoc: HTMLElement): weatherForecast[] {
+    private static parseWeatherForecasts(
+        weatherDoc: HTMLElement,
+    ): weatherForecast[] {
         return weatherDoc
-                .querySelector('.time_list.align_left')
-                .childNodes
-                .filter(n => n instanceof HTMLElement)
-                .map(n => n as HTMLElement)
-                .map((e: HTMLElement): weatherForecast => {
+            .querySelector('.time_list.align_left')
+            .childNodes.filter(n => n instanceof HTMLElement)
+            .map(n => n as HTMLElement)
+            .map((e: HTMLElement): weatherForecast => {
+                const degrees = Number(e.getAttribute('data-tmpr'));
+                const condition = e.getAttribute('data-wetr-txt') as string;
 
-                    const degrees = Number(e.getAttribute('data-tmpr'));
-                    const condition = e.getAttribute('data-wetr-txt') as string;
+                const dateTime = e.getAttribute('data-ymdt') as string;
+                const time = naverService.parseTime(dateTime);
 
-                    const dateTime = e.getAttribute('data-ymdt') as string;
-                    const time = naverService.parseTime(dateTime)
-
-                    return {
-                        temperature: { degrees: degrees, type: scale.C },
-                        condition: condition,
-                        time: time,
-                    }
-                });
+                return {
+                    temperature: { degrees: degrees, type: scale.C },
+                    condition: condition,
+                    time: time,
+                };
+            });
     }
-
 
     /**
      * Parse the rain forecasts from the main weather page.
@@ -288,20 +319,23 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     private static parseRainForecasts(weatherDoc: HTMLElement): rainForecast[] {
+        const rainSection = weatherDoc.querySelector(
+            'div[data-nclk="wtk.rainhrscr"]',
+        );
 
-        const rainSection = weatherDoc.querySelector('div[data-nclk="wtk.rainhrscr"]');
+        const percentages = rainSection
+            ?.querySelector('tr.row_icon')
+            ?.querySelectorAll('td.data');
 
-        const percentages = rainSection?.
-            querySelector('tr.row_icon')?.
-            querySelectorAll('td.data');
+        const amounts = rainSection
+            ?.querySelector('tr.row_graph.row_rain')
+            ?.querySelectorAll('td.data');
 
-        const amounts = rainSection?.
-            querySelector('tr.row_graph.row_rain')?.
-            querySelectorAll('td.data');
-
-        if (percentages === undefined
-            || amounts === undefined
-            || percentages.length != amounts.length) {
+        if (
+            percentages === undefined ||
+            amounts === undefined ||
+            percentages.length != amounts.length
+        ) {
             return [];
         }
 
@@ -310,18 +344,21 @@ export class naverService implements locationService, weatherService {
             const percentage = percentages[i];
             const amount = amounts[i];
 
-            rainForecasts.push(
-                {
-                    percentChance: Number(percentage.querySelector('em.value')?.textContent),
-                    amount: Number(amount.querySelector('div.data_inner')?.textContent),
-                    time: naverService.parseTime(percentage.getAttribute('data-ymdt') as string)
-                }
-            );
+            rainForecasts.push({
+                percentChance: Number(
+                    percentage.querySelector('em.value')?.textContent,
+                ),
+                amount: Number(
+                    amount.querySelector('div.data_inner')?.textContent,
+                ),
+                time: naverService.parseTime(
+                    percentage.getAttribute('data-ymdt') as string,
+                ),
+            });
         }
 
         return rainForecasts;
     }
-
 
     /**
      * Parse the humidity forecasts from the main weather page.
@@ -332,22 +369,27 @@ export class naverService implements locationService, weatherService {
      * @return {*}  {humidityForecast[]}
      * @memberof naverService
      */
-    private static parseHumidityForecasts(weatherDoc: HTMLElement): humidityForecast[] {
+    private static parseHumidityForecasts(
+        weatherDoc: HTMLElement,
+    ): humidityForecast[] {
+        const humiditySection = weatherDoc.querySelector(
+            'div[data-nclk="wtk.humihrscr"]',
+        );
 
-        const humiditySection = weatherDoc.querySelector('div[data-nclk="wtk.humihrscr"]');
-
-        const humidities = humiditySection?.
-            querySelectorAll('td.data');
+        const humidities = humiditySection?.querySelectorAll('td.data');
 
         if (humidities === undefined) {
             return [];
         }
 
-        return Array.from(humidities)
-            .map((e: Element): humidityForecast => ({
+        return Array.from(humidities).map(
+            (e: Element): humidityForecast => ({
                 humidity: Number(e.querySelector('span.num')?.textContent),
-                time: naverService.parseTime(e.getAttribute('data-ymdt') as string)
-            }));
+                time: naverService.parseTime(
+                    e.getAttribute('data-ymdt') as string,
+                ),
+            }),
+        );
     }
 
     /**
@@ -360,20 +402,23 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     private static parseWindForecasts(weatherDoc: HTMLElement): windForecast[] {
+        const windSection = weatherDoc.querySelector(
+            'div[data-nclk="wtk.windhrscr"]',
+        );
 
-        const windSection = weatherDoc.querySelector('div[data-nclk="wtk.windhrscr"]');
+        const directions = windSection
+            ?.querySelector('tr.row_icon')
+            ?.querySelectorAll('td.data');
 
-        const directions = windSection?.
-            querySelector('tr.row_icon')?.
-            querySelectorAll('td.data');
+        const speeds = windSection
+            ?.querySelector('tr.row_graph')
+            ?.querySelectorAll('td.data');
 
-        const speeds = windSection?.
-            querySelector('tr.row_graph')?.
-            querySelectorAll('td.data');
-
-        if (directions === undefined
-            || speeds === undefined
-            || directions.length != speeds.length) {
+        if (
+            directions === undefined ||
+            speeds === undefined ||
+            directions.length != speeds.length
+        ) {
             return [];
         }
 
@@ -382,13 +427,14 @@ export class naverService implements locationService, weatherService {
             const direction = directions[i];
             const speed = speeds[i];
 
-            windForecasts.push(
-                {
-                    direction: direction.querySelector('span.value')?.textContent as string,
-                    speed: Number(speed.querySelector('span.num')?.textContent),
-                    time: naverService.parseTime(speed.getAttribute('data-ymdt') as string)
-                }
-            );
+            windForecasts.push({
+                direction: direction.querySelector('span.value')
+                    ?.textContent as string,
+                speed: Number(speed.querySelector('span.num')?.textContent),
+                time: naverService.parseTime(
+                    speed.getAttribute('data-ymdt') as string,
+                ),
+            });
         }
 
         return windForecasts;
@@ -409,7 +455,10 @@ export class naverService implements locationService, weatherService {
             Number(dateTime.substr(4, 2)) - 1,
             Number(dateTime.substr(6, 2)),
             Number(dateTime.substr(8, 2)),
-            0, 0, 0);
+            0,
+            0,
+            0,
+        );
     }
 }
 
