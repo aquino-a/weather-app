@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Alert,
+    ScrollView,
+    RefreshControl,
+} from 'react-native';
 
 import { weatherServiceInstance as weatherService } from '../../service/serviceFactory';
 import { location } from '../../service/locationService';
@@ -11,32 +18,42 @@ import RainForecast from './RainForecast';
 import WeatherForecast from './WeatherForecast';
 import WindForecast from './WindForecast';
 
-
-
 /**
  * The parent component of all weather child components.
  *
  * @param {{ location: location }} props
- * @return {*} 
+ * @return {*}
  */
 const Weather = (props: { location: location }) => {
-
     const { location } = props;
 
     const [weather, setWeather] = useState<weather | null>(null);
+    const [refreshing, setRefreshing] = useState<boolean>(false);
+
+    const searchWeather = async () => {
+        try {
+            const foundWeather = await weatherService.searchWeather(
+                location!.code,
+            );
+            setWeather(foundWeather);
+        } catch (error) {
+            console.log('weather result in wrong format');
+            console.log(error);
+            Alert.alert('Data unavailable.', 'Choose different location.');
+        }
+    };
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await searchWeather();
+        setRefreshing(false);
+    };
 
     useEffect(() => {
         if (!location || location.code === '') {
             return;
         }
-        weatherService
-            .searchWeather(location!.code)
-            .then(setWeather)
-            .catch(e => {
-                console.log('weather result in wrong format');
-                console.log(e);
-                Alert.alert('Data unavailable.', 'Choose different location.');
-            });
+        searchWeather();
     }, [location]);
 
     if (!location || location.code === '') {
@@ -56,7 +73,11 @@ const Weather = (props: { location: location }) => {
     }
 
     return (
-        <View>
+        <ScrollView
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+        >
             <Current weather={weather} />
             <View style={styles.childContainer}>
                 <WeatherForecast weather={weather} />
@@ -70,7 +91,7 @@ const Weather = (props: { location: location }) => {
             <View style={styles.childContainer}>
                 <WindForecast weather={weather} />
             </View> */}
-        </View>
+        </ScrollView>
     );
 };
 
