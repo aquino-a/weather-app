@@ -82,7 +82,7 @@ const Weather = (props: { location: location }) => {
             <View style={styles.childContainer}>
                 <WeatherForecast weather={weather} />
             </View>
-            {/* <View style={styles.childContainer}>
+            <View style={styles.childContainer}>
                 <HumidityForecast weather={weather} />
             </View>
             <View style={styles.childContainer}>
@@ -90,7 +90,7 @@ const Weather = (props: { location: location }) => {
             </View>
             <View style={styles.childContainer}>
                 <WindForecast weather={weather} />
-            </View> */}
+            </View>
         </ScrollView>
     );
 };
