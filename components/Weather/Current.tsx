@@ -85,23 +85,24 @@ const Current = (props: { weather: weather }) => {
 
 const styles = StyleSheet.create({
     currentView: {
-        flex: 1,
+        flex: 2,
         alignItems: 'center',
     },
     temperature: {
-        flex: 1,
         backgroundColor: 'transparent',
     },
     temperatureText: {
-        fontSize: 60,
+        fontSize: 90,
         padding: 0,
         fontWeight: 'bold',
         textAlignVertical: 'center',
     },
     condition: {
-        flex: 0.5,
+        flex: 1.75,
         textAlignVertical: 'center',
         alignSelf: 'center',
+        fontWeight: 'bold',
+        fontSize: 20,
     },
     miscDetails: {
         flex: 0.5,
