@@ -50,6 +50,12 @@ const Current = (props: { weather: weather }) => {
                     {weather!.feel.degrees}°
                 </Text>
             </View>
+            {weather.rainAmount > 0 && (
+                <View style={styles.rain}>
+                    <Text style={styles.rainLabel}>Rain: </Text>
+                    <Text style={styles.rainData}>{weather.rainAmount}mm</Text>
+                </View>
+            )}
             <View style={styles.dust}>
                 <View style={[styles.dustBox, dustStyle(weather.dust).dustBox]}>
                     <Text>Dust</Text>
@@ -109,18 +115,34 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     miscDetailsLabel: {
-        fontSize: 12,
+        fontSize: 14,
         color: 'gray',
         fontWeight: 'bold',
         textAlignVertical: 'center',
         padding: 2,
     },
     miscDetailsData: {
-        fontSize: 15,
+        fontSize: 16,
         color: 'black',
         fontWeight: 'bold',
         textAlignVertical: 'center',
         padding: 2,
+    },
+    rain: {
+        flex: 1,
+        flexDirection: 'row',
+        padding: 3,
+    },
+    rainLabel: {
+        fontSize: 14,
+        color: 'gray',
+        textAlignVertical: 'center',
+    },
+    rainData: {
+        fontSize: 16,
+        color: '#32a1ff',
+        fontWeight: 'bold',
+        textAlignVertical: 'center',
     },
     dust: {
         flex: 0.75,
@@ -130,7 +152,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         margin: 2,
         paddingHorizontal: 2,
-        paddingVertical: 0,
+        paddingVertical: 1,
         borderRadius: 4,
         backgroundColor: '#eef6fb',
         width: 100,
@@ -139,10 +161,10 @@ const styles = StyleSheet.create({
     dustData: {
         color: '#32a1ff',
         fontWeight: 'bold',
-        fontSize: 15,
+        fontSize: 16,
     },
     separator: {
-        fontSize: 12,
+        fontSize: 14,
         color: 'green',
         fontWeight: 'bold',
         textAlignVertical: 'center',
