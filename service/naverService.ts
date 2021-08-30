@@ -352,11 +352,19 @@ export class naverService implements locationService, weatherService {
         }
 
         return {
-            rainForecasts: data.map(hf => ({
-                amount: Number(hf.rainAmt),
-                percentChance: Number(hf.rainProb),
-                time: naverService.parseTime(hf.aplYmdt),
-            })),
+            rainForecasts: data.map(hf => {
+                let rainAmount = hf.rainAmt;
+                if (rainAmount.lastIndexOf('~') >= 0) {
+                    const index = rainAmount.lastIndexOf('~') + 1;
+                    rainAmount = rainAmount.substr(index);
+                }
+
+                return {
+                    amount: Number(rainAmount),
+                    percentChance: Number(hf.rainProb),
+                    time: naverService.parseTime(hf.aplYmdt),
+                };
+            }),
             humidityForecasts: data.map(hf => ({
                 humidity: Number(hf.humd),
                 time: naverService.parseTime(hf.aplYmdt),
@@ -530,7 +538,7 @@ export class naverService implements locationService, weatherService {
 interface HiddenForecast {
     aplYmdt: string;
     rainProb: number;
-    rainAmt: number;
+    rainAmt: string;
     humd: number;
     windDrctn: string;
     windDrctnName: string;
