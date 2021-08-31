@@ -28,4 +28,9 @@ const styles = StyleSheet.create({
     tomorrowTomorrow: {
         backgroundColor: 'snow',
     },
+    base: {
+        paddingHorizontal: 2,
+    },
 });
+
+export const baseStyle = styles.base;

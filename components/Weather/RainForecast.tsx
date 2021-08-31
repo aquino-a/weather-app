@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ListRenderItem, View, Text, FlatList, StyleSheet } from 'react-native';
 
 import { rainForecast, weather } from '../../service/weatherService';
-import { getItemStyle } from './weatherChildren';
+import { baseStyle, getItemStyle } from './weatherChildren';
 
 /**
  * A component that displays the rain forecasts.
@@ -15,7 +15,7 @@ const RainForecast = (props: { weather: weather }) => {
 
     const renderRain: ListRenderItem<rainForecast> = ({ item }) => {
         return (
-            <View style={getItemStyle(item.time)}>
+            <View style={[getItemStyle(item.time), baseStyle]}>
                 <Text>{item.time.getHours()}</Text>
                 <Text>{item.percentChance}%</Text>
                 <Text>{item.amount}mm</Text>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ListRenderItem, View, Text, FlatList, StyleSheet } from 'react-native';
 
 import { weather, weatherForecast } from '../../service/weatherService';
-import { getItemStyle } from './weatherChildren';
+import { baseStyle, getItemStyle } from './weatherChildren';
 
 
 /**
@@ -16,7 +16,7 @@ const WeatherForecast = (props: { weather: weather }) => {
 
     const renderWeather: ListRenderItem<weatherForecast> = ({ item }) => {
         return (
-            <View style={getItemStyle(item.time)}>
+            <View style={[getItemStyle(item.time), baseStyle]}>
                 <Text>{item.time.getHours()}</Text>
                 <Text>{item.condition}</Text>
                 <Text>{item.temperature.degrees}°</Text>

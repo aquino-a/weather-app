@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FlatList, ListRenderItem, View, Text, StyleSheet } from 'react-native';
 
 import { humidityForecast, weather } from '../../service/weatherService';
-import { getItemStyle } from './weatherChildren';
+import { baseStyle, getItemStyle } from './weatherChildren';
 
 /**
  * A component that displays the humidity forecast.
@@ -15,7 +15,7 @@ const HumidityForecast = (props: { weather: weather }) => {
 
     const renderHumidity: ListRenderItem<humidityForecast> = ({ item }) => {
         return (
-            <View style={getItemStyle(item.time)}>
+            <View style={[getItemStyle(item.time), baseStyle]}>
                 <Text>{item.time.getHours()}</Text>
                 <Text>{item.humidity}%</Text>
             </View>
