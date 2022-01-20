@@ -1,26 +1,26 @@
-export interface weatherService {
-    searchWeather(locationCode: string): Promise<weather>;
+export interface WeatherService {
+    searchWeather(locationCode: string): Promise<Weather>;
     setWeatherSource(
         locationCode: string,
-        source: weatherSource
+        source: WeatherSource
     ): Promise<void>;
 }
 
-export default class fakeWeatherService implements weatherService {
+export default class FakeWeatherService implements WeatherService {
     setWeatherSource(
-        locationCode: string,
-        source: weatherSource
+        _locationCode: string,
+        _source: WeatherSource
     ): Promise<void> {
         return Promise.resolve();
     }
 
-    searchWeather(locationCode: string): Promise<weather> {
+    searchWeather(_locationCode: string): Promise<Weather> {
         return Promise.resolve({
             condition: 'condition',
             dust: 'good',
             feel: {
                 degrees: Math.ceil(Math.random() * 10 + 20),
-                type: scale.C,
+                type: Scale.C,
             },
             humidity: Math.ceil(Math.random() * 100),
             humidityForecasts: this.generateHumidityForecasts(),
@@ -29,7 +29,7 @@ export default class fakeWeatherService implements weatherService {
             rainForecasts: this.generateRainForecasts(),
             temperature: {
                 degrees: Math.ceil(Math.random() * 10 + 20),
-                type: scale.F,
+                type: Scale.F,
             },
             weatherForecasts: this.generateWeatherForecasts(),
             windDirection: 'north west',
@@ -38,8 +38,8 @@ export default class fakeWeatherService implements weatherService {
         });
     }
 
-    generateHumidityForecasts = (): humidityForecast[] => {
-        const forecasts: humidityForecast[] = [];
+    generateHumidityForecasts = (): HumidityForecast[] => {
+        const forecasts: HumidityForecast[] = [];
         for (let i = 0; i < 70; i++) {
             forecasts.push({
                 humidity: Math.ceil(Math.random() * 100),
@@ -49,14 +49,14 @@ export default class fakeWeatherService implements weatherService {
         return forecasts;
     };
 
-    generateWeatherForecasts = (): weatherForecast[] => {
-        const forecasts: weatherForecast[] = [];
+    generateWeatherForecasts = (): WeatherForecast[] => {
+        const forecasts: WeatherForecast[] = [];
         for (let i = 0; i < 70; i++) {
             forecasts.push({
                 condition: 'good',
                 temperature: {
                     degrees: 20 + Math.ceil(Math.random() * 15),
-                    type: scale.C,
+                    type: Scale.C,
                 },
                 time: new Date(),
             });
@@ -64,8 +64,8 @@ export default class fakeWeatherService implements weatherService {
         return forecasts;
     };
 
-    generateRainForecasts = (): rainForecast[] => {
-        const forecasts: rainForecast[] = [];
+    generateRainForecasts = (): RainForecast[] => {
+        const forecasts: RainForecast[] = [];
         for (let i = 0; i < 70; i++) {
             forecasts.push({
                 amount: Math.ceil(Math.random() * 25),
@@ -76,8 +76,8 @@ export default class fakeWeatherService implements weatherService {
         return forecasts;
     };
 
-    generateWindForecasts = (): windForecast[] => {
-        const forecasts: windForecast[] = [];
+    generateWindForecasts = (): WindForecast[] => {
+        const forecasts: WindForecast[] = [];
         for (let i = 0; i < 70; i++) {
             forecasts.push({
                 direction: 'north west',
@@ -89,57 +89,57 @@ export default class fakeWeatherService implements weatherService {
     };
 }
 
-export interface weather {
-    temperature: temperature;
+export interface Weather {
+    temperature: Temperature;
     humidity: number;
     windSpeed: number;
     windDirection: string;
-    feel: temperature;
+    feel: Temperature;
     dust: string;
     microDust: string;
     condition: string;
     rainAmount: number;
 
-    rainForecasts: rainForecast[];
-    humidityForecasts: humidityForecast[];
-    windForecasts: windForecast[];
-    weatherForecasts: weatherForecast[];
+    rainForecasts: RainForecast[];
+    humidityForecasts: HumidityForecast[];
+    windForecasts: WindForecast[];
+    weatherForecasts: WeatherForecast[];
 }
 
-export interface temperature {
+export interface Temperature {
     degrees: number;
-    type: scale;
+    type: Scale;
 }
 
-export enum scale {
+export enum Scale {
     C,
     F,
 }
 
-export enum weatherSource {
+export enum WeatherSource {
     ACCUWEATHER,
     KMA,
     TWC,
 }
 
-export interface weatherForecast {
-    temperature: temperature;
+export interface WeatherForecast {
+    temperature: Temperature;
     condition: string;
     time: Date;
 }
 
-export interface rainForecast {
+export interface RainForecast {
     percentChance: number;
     amount: number;
     time: Date;
 }
 
-export interface humidityForecast {
+export interface HumidityForecast {
     humidity: number;
     time: Date;
 }
 
-export interface windForecast {
+export interface WindForecast {
     direction: string;
     speed: number;
     time: Date;

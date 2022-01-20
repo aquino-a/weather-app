@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { ListRenderItem, View, Text, FlatList, StyleSheet } from 'react-native';
+import React from 'react';
+import { ListRenderItem, View, Text, FlatList } from 'react-native';
 
-import { weather, windForecast } from '../../service/weatherService';
+import { Weather, WindForecast } from '../../service/weatherService';
 import { baseStyle, getItemStyle } from './weatherChildren';
 
 /**
  * A component that displays the wind forecasts.
  *
- * @param {{ weather: weather }} props
+ * @param {{ weather: Weather }} props
  * @return {*}
  */
-const WindForecast = (props: { weather: weather }) => {
+const WindForecast = (props: { weather: Weather }) => {
     const { windForecasts } = props.weather!;
 
-    const renderWind: ListRenderItem<windForecast> = ({ item }) => {
+    const renderWind: ListRenderItem<WindForecast> = ({ item }) => {
         return (
             <View style={[getItemStyle(item.time), baseStyle]}>
                 <Text>{item.time.getHours()}</Text>
@@ -39,10 +39,10 @@ const WindForecast = (props: { weather: weather }) => {
     );
 };
 
-const styles = StyleSheet.create({
-    list: {
-        width: 250,
-    },
-});
+// const styles = StyleSheet.create({
+//     list: {
+//         width: 250,
+//     },
+// });
 
 export default WindForecast;

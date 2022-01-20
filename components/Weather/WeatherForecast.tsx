@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { ListRenderItem, View, Text, FlatList, StyleSheet } from 'react-native';
+import React from 'react';
+import { ListRenderItem, View, Text, FlatList } from 'react-native';
 
-import { weather, weatherForecast } from '../../service/weatherService';
+import { Weather, WeatherForecast } from '../../service/weatherService';
 import { baseStyle, getItemStyle } from './weatherChildren';
 
 /**
  * A component that displays the weather forecasts.
  *
- * @param {{ weather: weather }} props
+ * @param {{ weather: Weather }} props
  * @return {*}
  */
-const WeatherForecast = (props: { weather: weather }) => {
+const WeatherForecast = (props: { weather: Weather }) => {
     const { weatherForecasts } = props.weather!;
 
-    const renderWeather: ListRenderItem<weatherForecast> = ({ item }) => {
+    const renderWeather: ListRenderItem<WeatherForecast> = ({ item }) => {
         return (
             <View style={[getItemStyle(item.time), baseStyle]}>
                 <Text>{item.time.getHours()}</Text>

@@ -1,23 +1,23 @@
 import { parse } from 'node-html-parser';
 
-import { location } from '../service/locationService';
-import naverServiceInstance, { naverService } from '../service/naverService';
-import { temperature, weather, weatherSource } from '../service/weatherService';
+import { Location } from '../service/locationService';
+import naverServiceInstance, { NaverService } from '../service/naverService';
+import { Temperature, WeatherSource } from '../service/weatherService';
 
 const fs = require('fs');
 const fetch = require('node-fetch');
 global.fetch = fetch;
 
-const ns = new naverService();
+const ns = new NaverService();
 
 test('search 봉천동', async () => {
-    expect(await ns.searchLocation('봉천동')).toStrictEqual<location[]>([
+    expect(await ns.searchLocation('봉천동')).toStrictEqual<Location[]>([
         { name: '서울특별시 관악구 봉천동', code: '09620101' },
     ]);
 });
 
 test('search 이태원', async () => {
-    expect(await ns.searchLocation('이태원')).toStrictEqual<location[]>([
+    expect(await ns.searchLocation('이태원')).toStrictEqual<Location[]>([
         { name: '서울특별시 용산구 이태원동', code: '09170130' },
         { name: '서울특별시 용산구 이태원2동', code: '09170660' },
         { name: '서울특별시 용산구 이태원1동', code: '09170650' },
@@ -28,12 +28,12 @@ test('parse static weather page', async () => {
     const rawHtml = fs.readFileSync('./service/test/weather-parse-test.html');
     const weatherDoc = parse(rawHtml);
 
-    const parsedWeather = naverService.parseWeather(weatherDoc);
+    const parsedWeather = NaverService.parseWeather(weatherDoc);
 
     expect(parsedWeather.condition).toBe<string>('소나기');
     expect(parsedWeather.dust).toBe<string>('좋음');
     expect(parsedWeather.condition).toBe<string>('소나기');
-    expect(parsedWeather.feel).toStrictEqual<temperature>({
+    expect(parsedWeather.feel).toStrictEqual<Temperature>({
         degrees: 23,
         type: 0,
     });
@@ -42,7 +42,7 @@ test('parse static weather page', async () => {
     expect(parsedWeather.microDust).toBe<string>('좋음');
     expect(parsedWeather.rainAmount).toBe<number>(0.1);
     expect(parsedWeather.rainForecasts.length).toBe<number>(70);
-    expect(parsedWeather.temperature).toStrictEqual<temperature>({
+    expect(parsedWeather.temperature).toStrictEqual<Temperature>({
         degrees: 21,
         type: 0,
     });
@@ -76,9 +76,9 @@ test('set weather source', async () => {
 
     await naverServiceInstance.setWeatherSource(
         '09170130',
-        weatherSource.ACCUWEATHER
+        WeatherSource.ACCUWEATHER
     );
-    var newParsedWeather = await naverServiceInstance.searchWeather('09170130');
+    // var newParsedWeather = await naverServiceInstance.searchWeather('09170130');
 
     console.log(JSON.stringify(parsedWeather));
 });

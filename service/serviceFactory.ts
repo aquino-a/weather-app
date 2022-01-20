@@ -1,6 +1,6 @@
 import naver from './naverService';
-import { locationService } from './locationService';
-import { weatherService } from './weatherService';
+import { LocationService } from './locationService';
+import { WeatherService } from './weatherService';
 
-export const locationServiceInstance: locationService = naver;
-export const weatherServiceInstance: weatherService = naver;
+export const locationServiceInstance: LocationService = naver;
+export const weatherServiceInstance: WeatherService = naver;

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import Location from './components/Location';
+import LocationComponent from './components/Location';
 import Weather from './components/Weather/Weather';
 
-import { location } from './service/locationService';
+import { Location } from './service/locationService';
 
 /**
  * A weather app that uses data from Naver.
@@ -13,18 +13,18 @@ import { location } from './service/locationService';
  * @return {*}
  */
 export default function App() {
-    const [currentLocation, setCurrentLocation] = useState<location | null>(
+    const [currentLocation, setCurrentLocation] = useState<Location | null>(
         null
     );
 
-    const onLocationChange = (location: location) => {
+    const onLocationChange = (location: Location) => {
         console.log(`on location change: ${JSON.stringify(location)}`);
         setCurrentLocation(location);
     };
 
     return (
         <View style={styles.container}>
-            <Location onLocationChange={onLocationChange} />
+            <LocationComponent onLocationChange={onLocationChange} />
             <Weather location={currentLocation} />
         </View>
     );

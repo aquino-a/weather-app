@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-import { weather } from '../../service/weatherService';
+import { Weather } from '../../service/weatherService';
 
 /**
  * A component that displays the current weather data.
  *
- * @param {{ weather: weather }} props
+ * @param {{ weather: Weather }} props
  * @return {*}
  */
-const Current = (props: { weather: weather }) => {
+const Current = (props: { weather: Weather }) => {
     const { weather } = props;
 
     const dustStyle = (dust: string) => {

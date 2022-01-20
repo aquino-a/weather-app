@@ -3,7 +3,6 @@ import {
     View,
     Text,
     Modal,
-    Alert,
     Pressable,
     StyleSheet,
     TextInput,
@@ -13,7 +12,7 @@ import {
 
 import { locationServiceInstance as locationService } from '../service/serviceFactory';
 import {
-    location,
+    Location,
     defaultLocation,
     locationKey,
 } from '../service/locationService';
@@ -26,19 +25,19 @@ import { getValue, storeValue } from '../service/storageService';
  *
  * @return {*}
  */
-const Location = (props: {
-    onLocationChange: (location: location) => void;
+const LocationComponent = (props: {
+    onLocationChange: (location: Location) => void;
 }) => {
     const { onLocationChange } = props;
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [currentLocation, setCurrentLocation] =
-        useState<location>(defaultLocation);
+        useState<Location>(defaultLocation);
     const [searchValue, setSearchValue] = useState<string>('');
-    const [locations, setLocations] = useState<location[]>([]);
+    const [locations, setLocations] = useState<Location[]>([]);
 
     useEffect(() => {
-        getValue<location>(locationKey, defaultLocation).then(location => {
+        getValue<Location>(locationKey, defaultLocation).then(location => {
             setCurrentLocation(location);
             console.log(`got location: ${JSON.stringify(location)}`);
         });
@@ -46,7 +45,7 @@ const Location = (props: {
 
     useEffect(() => {
         onLocationChange?.(currentLocation);
-    }, [currentLocation]);
+    }, [currentLocation, onLocationChange]);
 
     const onSearchChange = async (text: string) => {
         setSearchValue(text);
@@ -58,7 +57,7 @@ const Location = (props: {
         setLocations(await locationService.searchLocation(text));
     };
 
-    const renderLocation: ListRenderItem<location> = ({ item }) => {
+    const renderLocation: ListRenderItem<Location> = ({ item }) => {
         return (
             <Pressable
                 onPress={() => {
@@ -152,4 +151,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Location;
+export default LocationComponent;

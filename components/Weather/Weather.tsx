@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 
 import { weatherServiceInstance as weatherService } from '../../service/serviceFactory';
-import { location } from '../../service/locationService';
-import { weather } from '../../service/weatherService';
+import { Location } from '../../service/locationService';
+import { Weather } from '../../service/weatherService';
 
 import Current from './Current';
 import HumidityForecast from './HumidityForecast';
@@ -21,13 +21,13 @@ import WindForecast from './WindForecast';
 /**
  * The parent component of all weather child components.
  *
- * @param {{ location: location }} props
+ * @param {{ location: Location }} props
  * @return {*}
  */
-const Weather = (props: { location: location }) => {
+const Weather = (props: { location: Location }) => {
     const { location } = props;
 
-    const [weather, setWeather] = useState<weather | null>(null);
+    const [weather, setWeather] = useState<Weather | null>(null);
     const [refreshing, setRefreshing] = useState<boolean>(false);
 
     const searchWeather = async () => {
@@ -54,6 +54,7 @@ const Weather = (props: { location: location }) => {
             return;
         }
         searchWeather();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location]);
 
     if (!location || location.code === '') {
