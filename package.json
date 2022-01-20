@@ -54,5 +54,10 @@
         "bracketSpacing": true,
         "arrowParens": "avoid",
         "endOfLine": "crlf"
+    },
+    "eslintConfig": {
+        "extends": [
+            "@react-native-community"
+        ]
     }
 }
