@@ -34,6 +34,12 @@ export class naverService implements locationService, weatherService {
         'var townFcastListJson = (\\[[^]+\\]);',
         'gm',
     );
+
+    static readonly HIDDEN_CURRENT_DATA_REGEX: RegExp = new RegExp(
+        'var weatherSummary = ([^]+}});',
+        'gm',
+    );
+
     static readonly NEW_LINE_REGEX: RegExp = new RegExp('\\r?\\n|\\r', 'gm');
 
     private cookie: string;
@@ -159,11 +165,11 @@ export class naverService implements locationService, weatherService {
         ) as HTMLElement;
 
         const currentTemperature = naverService.parseTemperature(weatherArea);
-        const listDetails = naverService.parseListDetails(weatherArea);
+        const hiddenCurrent = naverService.parseHiddenCurrent(weatherDoc);
         const currentCondition = weatherArea.querySelector('.weather')!
             .textContent as string;
         const rainAmount = naverService.parseRain(weatherArea);
-        const dust = naverService.parseDust(weatherDoc);
+        const dust = naverService.parseHiddenDust(weatherDoc);
 
         //forecasts
         const weatherForecasts = naverService.parseWeatherForecasts(weatherDoc);
@@ -175,12 +181,12 @@ export class naverService implements locationService, weatherService {
 
         return {
             temperature: currentTemperature,
-            humidity: listDetails.humidity,
-            windSpeed: listDetails.windSpeed,
-            windDirection: listDetails.windDirection,
-            feel: listDetails.feel,
-            dust: dust.dust,
-            microDust: dust.microDust,
+            humidity: hiddenCurrent.humd,
+            windSpeed: hiddenCurrent.windSpd,
+            windDirection: hiddenCurrent.windDrctnName,
+            feel: { degrees: hiddenCurrent.stmpr, type: scale.C },
+            dust: dust.stationPM10Legend1,
+            microDust: dust.stationPM25Legend1,
             condition: currentCondition,
             rainAmount: rainAmount,
             rainForecasts: rainForecasts,
@@ -206,6 +212,19 @@ export class naverService implements locationService, weatherService {
             degrees: Number(naverService.TEMPERATURE_REGEX.exec(line)[1]),
             type: scale.C,
         };
+    }
+
+    /**
+     * Retrieves the hidden json data containing the current weather from the main weather page.
+     *
+     * @static
+     * @param {HTMLElement} weatherDoc
+     * @return {*}  {HiddenForecast}
+     * @memberof naverService
+     */
+    static parseHiddenCurrent(weatherDoc: HTMLElement): HiddenForecast {
+        const weatherSummary = naverService.findWeatherSummary(weatherDoc);
+        return weatherSummary.nowFcast as HiddenForecast;
     }
 
     /**
@@ -262,6 +281,48 @@ export class naverService implements locationService, weatherService {
         const rainAmount = rainArea.querySelector('strong').textContent;
 
         return Number(naverService.RAIN_REGEX.exec(rainAmount)[1]);
+    }
+
+    /**
+     * Parses the hidden air data in the main weather page.
+     *
+     * @private
+     * @static
+     * @param {HTMLElement} weatherDoc
+     * @return {*}  {HiddenAirForecast}
+     * @memberof naverService
+     */
+    private static parseHiddenDust(weatherDoc: HTMLElement): HiddenAirForecast {
+        const weatherSummary = naverService.findWeatherSummary(weatherDoc);
+        return weatherSummary.airFcast as HiddenAirForecast;
+    }
+
+    /**
+     * Finds and parses the hidden weather summary data from the main weather page.
+     *
+     * @private
+     * @static
+     * @param {HTMLElement} weatherDoc
+     * @return {*}  {*}
+     * @memberof naverService
+     */
+    private static findWeatherSummary(weatherDoc: HTMLElement): any {
+        const scripts = weatherDoc.querySelectorAll('script');
+        const lastScriptText = scripts[scripts.length - 1].textContent.replace(
+            /[\n\r]/g,
+            '',
+        );
+
+        try {
+            naverService.HIDDEN_CURRENT_DATA_REGEX.lastIndex = 0;
+            return JSON.parse(
+                naverService.HIDDEN_CURRENT_DATA_REGEX.exec(lastScriptText)![1],
+            );
+        } catch (error) {
+            console.log(`last script: ${lastScriptText}`);
+            console.log(error);
+            throw error;
+        }
     }
 
     /**
@@ -338,6 +399,7 @@ export class naverService implements locationService, weatherService {
 
         let data;
         try {
+            this.HIDDEN_DATA_REGEX.lastIndex = 0;
             data = JSON.parse(
                 this.HIDDEN_DATA_REGEX.exec(lastScriptText)![1],
             ) as HiddenForecast[];
@@ -543,6 +605,21 @@ interface HiddenForecast {
     windDrctn: string;
     windDrctnName: string;
     windSpd: number;
+    tmpr: number;
+    stmpr: number;
+    wetrTxt: string;
+}
+
+/**
+ * The interface for the hidden air forecast data.
+ *
+ * @interface HiddenAirForecast
+ */
+interface HiddenAirForecast {
+    stationPM10: number;
+    stationPM10Legend1: string;
+    stationPM25: number;
+    stationPM25Legend1: string;
 }
 
 const naverServiceInstance = new naverService();

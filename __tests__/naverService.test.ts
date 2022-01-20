@@ -1,8 +1,8 @@
 import { parse } from 'node-html-parser';
 
-import { location } from '../locationService';
-import naverServiceInstance, { naverService } from '../naverService';
-import { temperature, weather, weatherSource } from '../weatherService';
+import { location } from '../service/locationService';
+import naverServiceInstance, { naverService } from '../service/naverService';
+import { temperature, weather, weatherSource } from '../service/weatherService';
 
 const fs = require('fs');
 const fetch = require('node-fetch');
@@ -68,7 +68,7 @@ test('parse live weather page', async () => {
     expect(parsedWeather.weatherForecasts.length).toBeGreaterThan(0);
     expect(parsedWeather.windDirection).not.toBeNull();
     expect(parsedWeather.windForecasts.length).toBeGreaterThan(0);
-    expect(parsedWeather.windSpeed).toBeGreaterThan(0);
+    expect(parsedWeather.windSpeed).toBeGreaterThan(-1);
 });
 
 test('set weather source', async () => {
