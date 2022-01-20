@@ -1,8 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, Alert, Pressable, StyleSheet, TextInput, FlatList, ListRenderItem } from "react-native";
+import {
+    View,
+    Text,
+    Modal,
+    Alert,
+    Pressable,
+    StyleSheet,
+    TextInput,
+    FlatList,
+    ListRenderItem,
+} from 'react-native';
 
 import { locationServiceInstance as locationService } from '../service/serviceFactory';
-import { location, defaultLocation, locationKey } from '../service/locationService';
+import {
+    location,
+    defaultLocation,
+    locationKey,
+} from '../service/locationService';
 import { getValue, storeValue } from '../service/storageService';
 
 /**
@@ -10,31 +24,31 @@ import { getValue, storeValue } from '../service/storageService';
  * Will open a modal to choose a location when selected.
  * Loads the last picked location from async storage.
  *
- * @return {*} 
+ * @return {*}
  */
-const Location = (props: { onLocationChange: ((location: location) => void) }) => {
-
+const Location = (props: {
+    onLocationChange: (location: location) => void;
+}) => {
     const { onLocationChange } = props;
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
-    const [currentLocation, setCurrentLocation] = useState<location>(defaultLocation);
-    const [searchValue, setSearchValue] = useState<string>("");
+    const [currentLocation, setCurrentLocation] =
+        useState<location>(defaultLocation);
+    const [searchValue, setSearchValue] = useState<string>('');
     const [locations, setLocations] = useState<location[]>([]);
 
     useEffect(() => {
-        getValue<location>(locationKey, defaultLocation)
-            .then(location => {
-                setCurrentLocation(location);
-                console.log(`got location: ${JSON.stringify(location)}`)
-            });
+        getValue<location>(locationKey, defaultLocation).then(location => {
+            setCurrentLocation(location);
+            console.log(`got location: ${JSON.stringify(location)}`);
+        });
     }, []);
 
     useEffect(() => {
         onLocationChange?.(currentLocation);
-    }, [currentLocation])
+    }, [currentLocation]);
 
     const onSearchChange = async (text: string) => {
-
         setSearchValue(text);
 
         if (text.length < 2) {
@@ -42,10 +56,9 @@ const Location = (props: { onLocationChange: ((location: location) => void) }) =
         }
 
         setLocations(await locationService.searchLocation(text));
-    }
+    };
 
     const renderLocation: ListRenderItem<location> = ({ item }) => {
-
         return (
             <Pressable
                 onPress={() => {
@@ -54,16 +67,16 @@ const Location = (props: { onLocationChange: ((location: location) => void) }) =
                     storeValue(locationKey, item);
                 }}
             >
-                <View >
+                <View>
                     <Text>{item.name}</Text>
                 </View>
             </Pressable>
         );
-    }
+    };
 
     return (
         <View>
-            <View >
+            <View>
                 <Modal
                     // style={styles.locationSelect}
                     animationType="fade"
@@ -92,7 +105,10 @@ const Location = (props: { onLocationChange: ((location: location) => void) }) =
                 </Modal>
             </View>
             <Pressable
-                onPress={() => {console.log("location clicked"); setModalVisible(true);}}
+                onPress={() => {
+                    console.log('location clicked');
+                    setModalVisible(true);
+                }}
             >
                 <View style={styles.locationView}>
                     <Text>{currentLocation.name}</Text>
@@ -101,7 +117,6 @@ const Location = (props: { onLocationChange: ((location: location) => void) }) =
         </View>
     );
 };
-
 
 const styles = StyleSheet.create({
     locationView: {
@@ -112,30 +127,29 @@ const styles = StyleSheet.create({
     },
     centeredView: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 10
-      },
-      modalView: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    modalView: {
         margin: 20,
-        backgroundColor: "white",
+        backgroundColor: 'white',
         borderRadius: 20,
         padding: 35,
-        alignItems: "center",
-        shadowColor: "#000",
+        alignItems: 'center',
+        shadowColor: '#000',
         shadowOffset: {
-          width: 0,
-          height: 2
+            width: 0,
+            height: 2,
         },
         shadowOpacity: 0.25,
         shadowRadius: 4,
-        elevation: 5
-      },
-      locationInput: {
-          padding: 5,
-          fontSize: 30
-      }
+        elevation: 5,
+    },
+    locationInput: {
+        padding: 5,
+        fontSize: 30,
+    },
 });
-
 
 export default Location;

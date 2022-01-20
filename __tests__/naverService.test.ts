@@ -76,7 +76,7 @@ test('set weather source', async () => {
 
     await naverServiceInstance.setWeatherSource(
         '09170130',
-        weatherSource.ACCUWEATHER,
+        weatherSource.ACCUWEATHER
     );
     var newParsedWeather = await naverServiceInstance.searchWeather('09170130');
 

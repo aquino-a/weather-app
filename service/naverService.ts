@@ -28,16 +28,16 @@ export class naverService implements locationService, weatherService {
     static readonly RAIN_REGEX: RegExp = new RegExp('(\\d+(?:\\.\\d+)?) *mm');
     static readonly COOKIE_REGEX: RegExp = new RegExp(
         '[A-Z\\d_]+="?[A-Za-z\\d]*=?"?',
-        'g',
+        'g'
     );
     static readonly HIDDEN_DATA_REGEX: RegExp = new RegExp(
         'var townFcastListJson = (\\[[^]+\\]);',
-        'gm',
+        'gm'
     );
 
     static readonly HIDDEN_CURRENT_DATA_REGEX: RegExp = new RegExp(
         'var weatherSummary = ([^]+}});',
-        'gm',
+        'gm'
     );
 
     static readonly NEW_LINE_REGEX: RegExp = new RegExp('\\r?\\n|\\r', 'gm');
@@ -98,7 +98,7 @@ export class naverService implements locationService, weatherService {
      */
     async searchWeather(locationCode: string): Promise<weather> {
         const url = new URL(
-            `https://${naverService.NAVER_BASE_URL}/today/${locationCode}?cpName=ACCUWEATHER`,
+            `https://${naverService.NAVER_BASE_URL}/today/${locationCode}?cpName=ACCUWEATHER`
         );
 
         const response = await fetch(url, {
@@ -127,10 +127,10 @@ export class naverService implements locationService, weatherService {
      */
     async setWeatherSource(
         locationCode: string,
-        source: weatherSource,
+        source: weatherSource
     ): Promise<void> {
         const url = new URL(
-            `https://${naverService.NAVER_BASE_URL}/today/api/follow`,
+            `https://${naverService.NAVER_BASE_URL}/today/api/follow`
         );
         const data = {
             regionCode: locationCode,
@@ -161,7 +161,7 @@ export class naverService implements locationService, weatherService {
     static parseWeather(weatherDoc: HTMLElement): weather {
         // weather_area
         const weatherArea = weatherDoc.querySelector(
-            '.weather_area',
+            '.weather_area'
         ) as HTMLElement;
 
         const currentTemperature = naverService.parseTemperature(weatherArea);
@@ -245,17 +245,17 @@ export class naverService implements locationService, weatherService {
 
         return {
             humidity: Number(
-                naverService.PERCENT_REGEX.exec(list[start + 1].textContent)[1],
+                naverService.PERCENT_REGEX.exec(list[start + 1].textContent)[1]
             ),
             windDirection: list[start + 2].textContent,
             windSpeed: Number(
-                naverService.SPEED_REGEX.exec(list[start + 3].textContent)[1],
+                naverService.SPEED_REGEX.exec(list[start + 3].textContent)[1]
             ),
             feel: {
                 degrees: Number(
                     naverService.TEMPERATURE_REGEX.exec(
-                        list[start + 5].textContent,
-                    )[1],
+                        list[start + 5].textContent
+                    )[1]
                 ),
                 type: scale.C,
             },
@@ -310,13 +310,13 @@ export class naverService implements locationService, weatherService {
         const scripts = weatherDoc.querySelectorAll('script');
         const lastScriptText = scripts[scripts.length - 1].textContent.replace(
             /[\n\r]/g,
-            '',
+            ''
         );
 
         try {
             naverService.HIDDEN_CURRENT_DATA_REGEX.lastIndex = 0;
             return JSON.parse(
-                naverService.HIDDEN_CURRENT_DATA_REGEX.exec(lastScriptText)![1],
+                naverService.HIDDEN_CURRENT_DATA_REGEX.exec(lastScriptText)![1]
             );
         } catch (error) {
             console.log(`last script: ${lastScriptText}`);
@@ -355,7 +355,7 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     private static parseWeatherForecasts(
-        weatherDoc: HTMLElement,
+        weatherDoc: HTMLElement
     ): weatherForecast[] {
         return weatherDoc
             .querySelector('.time_list.align_left')
@@ -401,7 +401,7 @@ export class naverService implements locationService, weatherService {
         try {
             this.HIDDEN_DATA_REGEX.lastIndex = 0;
             data = JSON.parse(
-                this.HIDDEN_DATA_REGEX.exec(lastScriptText)![1],
+                this.HIDDEN_DATA_REGEX.exec(lastScriptText)![1]
             ) as HiddenForecast[];
         } catch (error) {
             console.log(`last script: ${lastScriptText}`);
@@ -450,7 +450,7 @@ export class naverService implements locationService, weatherService {
      */
     private static parseRainForecasts(weatherDoc: HTMLElement): rainForecast[] {
         const rainSection = weatherDoc.querySelector(
-            'div[data-nclk="wtk.rainhrscr"]',
+            'div[data-nclk="wtk.rainhrscr"]'
         );
 
         const percentages = rainSection
@@ -476,13 +476,13 @@ export class naverService implements locationService, weatherService {
 
             rainForecasts.push({
                 percentChance: Number(
-                    percentage.querySelector('em.value')?.textContent,
+                    percentage.querySelector('em.value')?.textContent
                 ),
                 amount: Number(
-                    amount.querySelector('div.data_inner')?.textContent,
+                    amount.querySelector('div.data_inner')?.textContent
                 ),
                 time: naverService.parseTime(
-                    percentage.getAttribute('data-ymdt') as string,
+                    percentage.getAttribute('data-ymdt') as string
                 ),
             });
         }
@@ -500,10 +500,10 @@ export class naverService implements locationService, weatherService {
      * @memberof naverService
      */
     private static parseHumidityForecasts(
-        weatherDoc: HTMLElement,
+        weatherDoc: HTMLElement
     ): humidityForecast[] {
         const humiditySection = weatherDoc.querySelector(
-            'div[data-nclk="wtk.humihrscr"]',
+            'div[data-nclk="wtk.humihrscr"]'
         );
 
         const humidities = humiditySection?.querySelectorAll('td.data');
@@ -516,9 +516,9 @@ export class naverService implements locationService, weatherService {
             (e: Element): humidityForecast => ({
                 humidity: Number(e.querySelector('span.num')?.textContent),
                 time: naverService.parseTime(
-                    e.getAttribute('data-ymdt') as string,
+                    e.getAttribute('data-ymdt') as string
                 ),
-            }),
+            })
         );
     }
 
@@ -533,7 +533,7 @@ export class naverService implements locationService, weatherService {
      */
     private static parseWindForecasts(weatherDoc: HTMLElement): windForecast[] {
         const windSection = weatherDoc.querySelector(
-            'div[data-nclk="wtk.windhrscr"]',
+            'div[data-nclk="wtk.windhrscr"]'
         );
 
         const directions = windSection
@@ -562,7 +562,7 @@ export class naverService implements locationService, weatherService {
                     ?.textContent as string,
                 speed: Number(speed.querySelector('span.num')?.textContent),
                 time: naverService.parseTime(
-                    speed.getAttribute('data-ymdt') as string,
+                    speed.getAttribute('data-ymdt') as string
                 ),
             });
         }
@@ -587,7 +587,7 @@ export class naverService implements locationService, weatherService {
             Number(dateTime.substr(8, 2)),
             0,
             0,
-            0,
+            0
         );
     }
 }

@@ -33,7 +33,7 @@ const Weather = (props: { location: location }) => {
     const searchWeather = async () => {
         try {
             const foundWeather = await weatherService.searchWeather(
-                location!.code,
+                location!.code
             );
             setWeather(foundWeather);
         } catch (error) {

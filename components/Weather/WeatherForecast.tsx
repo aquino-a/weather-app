@@ -4,7 +4,6 @@ import { ListRenderItem, View, Text, FlatList, StyleSheet } from 'react-native';
 import { weather, weatherForecast } from '../../service/weatherService';
 import { baseStyle, getItemStyle } from './weatherChildren';
 
-
 /**
  * A component that displays the weather forecasts.
  *

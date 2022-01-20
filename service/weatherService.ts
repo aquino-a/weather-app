@@ -1,11 +1,16 @@
-
 export interface weatherService {
     searchWeather(locationCode: string): Promise<weather>;
-    setWeatherSource(locationCode: string, source: weatherSource): Promise<void>;
+    setWeatherSource(
+        locationCode: string,
+        source: weatherSource
+    ): Promise<void>;
 }
 
 export default class fakeWeatherService implements weatherService {
-    setWeatherSource(locationCode: string, source: weatherSource): Promise<void> {
+    setWeatherSource(
+        locationCode: string,
+        source: weatherSource
+    ): Promise<void> {
         return Promise.resolve();
     }
 
@@ -13,72 +18,75 @@ export default class fakeWeatherService implements weatherService {
         return Promise.resolve({
             condition: 'condition',
             dust: 'good',
-            feel: { degrees: Math.ceil((Math.random() * 10) + 20), type: scale.C },
+            feel: {
+                degrees: Math.ceil(Math.random() * 10 + 20),
+                type: scale.C,
+            },
             humidity: Math.ceil(Math.random() * 100),
             humidityForecasts: this.generateHumidityForecasts(),
             microDust: 'good',
             rainAmount: Math.ceil(Math.random() * 5),
             rainForecasts: this.generateRainForecasts(),
-            temperature: { degrees: Math.ceil((Math.random() * 10) + 20), type: scale.F },
+            temperature: {
+                degrees: Math.ceil(Math.random() * 10 + 20),
+                type: scale.F,
+            },
             weatherForecasts: this.generateWeatherForecasts(),
             windDirection: 'north west',
             windForecasts: this.generateWindForecasts(),
-            windSpeed: Math.ceil(Math.random() * 5)
+            windSpeed: Math.ceil(Math.random() * 5),
         });
     }
 
     generateHumidityForecasts = (): humidityForecast[] => {
-
         const forecasts: humidityForecast[] = [];
         for (let i = 0; i < 70; i++) {
             forecasts.push({
                 humidity: Math.ceil(Math.random() * 100),
-                time: new Date()
+                time: new Date(),
             });
         }
         return forecasts;
-    }
+    };
 
     generateWeatherForecasts = (): weatherForecast[] => {
-
         const forecasts: weatherForecast[] = [];
         for (let i = 0; i < 70; i++) {
             forecasts.push({
                 condition: 'good',
-                temperature: { degrees: 20 + Math.ceil(Math.random() * 15), type: scale.C },
-                time: new Date()
+                temperature: {
+                    degrees: 20 + Math.ceil(Math.random() * 15),
+                    type: scale.C,
+                },
+                time: new Date(),
             });
         }
         return forecasts;
-    }
+    };
 
     generateRainForecasts = (): rainForecast[] => {
-
         const forecasts: rainForecast[] = [];
         for (let i = 0; i < 70; i++) {
             forecasts.push({
                 amount: Math.ceil(Math.random() * 25),
                 percentChance: Math.ceil(Math.random() * 100),
-                time: new Date()
+                time: new Date(),
             });
         }
         return forecasts;
-    }
+    };
 
     generateWindForecasts = (): windForecast[] => {
-
         const forecasts: windForecast[] = [];
         for (let i = 0; i < 70; i++) {
             forecasts.push({
                 direction: 'north west',
                 speed: Math.ceil(Math.random() * 5),
-                time: new Date()
+                time: new Date(),
             });
         }
         return forecasts;
-    }
-
-
+    };
 }
 
 export interface weather {
@@ -104,11 +112,14 @@ export interface temperature {
 }
 
 export enum scale {
-    C, F
+    C,
+    F,
 }
 
 export enum weatherSource {
-    ACCUWEATHER, KMA, TWC
+    ACCUWEATHER,
+    KMA,
+    TWC,
 }
 
 export interface weatherForecast {

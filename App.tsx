@@ -14,7 +14,7 @@ import { location } from './service/locationService';
  */
 export default function App() {
     const [currentLocation, setCurrentLocation] = useState<location | null>(
-        null,
+        null
     );
 
     const onLocationChange = (location: location) => {
