@@ -59,5 +59,8 @@
         "extends": [
             "@react-native-community"
         ]
+    },
+    "babel": {
+        "presets": ["module:metro-react-native-babel-preset"]
     }
 }
