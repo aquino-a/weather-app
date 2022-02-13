@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import LocationComponent from './components/Location';
-import Weather from './components/Weather/Weather';
+import WeatherComponent from './components/Weather/Weather';
 
 import { Location } from './service/locationService';
 
@@ -25,7 +25,7 @@ export default function App() {
     return (
         <View style={styles.container}>
             <LocationComponent onLocationChange={onLocationChange} />
-            <Weather location={currentLocation} />
+            <WeatherComponent location={currentLocation} />
         </View>
     );
 }

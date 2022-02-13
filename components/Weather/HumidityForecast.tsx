@@ -10,7 +10,7 @@ import { baseStyle, getItemStyle } from './weatherChildren';
  * @param {{ weather: Weather }} props
  * @return {*}
  */
-const HumidityForecast = (props: { weather: Weather }) => {
+const HumidityForecastComponent = (props: { weather: Weather }) => {
     const { humidityForecasts } = props.weather!;
 
     const renderHumidity: ListRenderItem<HumidityForecast> = ({ item }) => {
@@ -44,4 +44,4 @@ const HumidityForecast = (props: { weather: Weather }) => {
 //     },
 // });
 
-export default HumidityForecast;
+export default HumidityForecastComponent;

@@ -10,7 +10,7 @@ import { baseStyle, getItemStyle } from './weatherChildren';
  * @param {{ weather: Weather }} props
  * @return {*}
  */
-const RainForecast = (props: { weather: Weather }) => {
+const RainForecastComponent = (props: { weather: Weather }) => {
     const { rainForecasts } = props.weather!;
 
     const renderRain: ListRenderItem<RainForecast> = ({ item }) => {
@@ -45,4 +45,4 @@ const RainForecast = (props: { weather: Weather }) => {
 //     },
 // });
 
-export default RainForecast;
+export default RainForecastComponent;

@@ -13,10 +13,10 @@ import { Location } from '../../service/locationService';
 import { Weather } from '../../service/weatherService';
 
 import Current from './Current';
-import HumidityForecast from './HumidityForecast';
-import RainForecast from './RainForecast';
-import WeatherForecast from './WeatherForecast';
-import WindForecast from './WindForecast';
+import HumidityForecastComponent from './HumidityForecast';
+import RainForecastComponent from './RainForecast';
+import WeatherForecastComponent from './WeatherForecast';
+import WindForecastComponent from './WindForecast';
 
 /**
  * The parent component of all weather child components.
@@ -24,7 +24,7 @@ import WindForecast from './WindForecast';
  * @param {{ location: Location }} props
  * @return {*}
  */
-const Weather = (props: { location: Location }) => {
+const WeatherComponent = (props: { location: Location }) => {
     const { location } = props;
 
     const [weather, setWeather] = useState<Weather | null>(null);
@@ -81,16 +81,16 @@ const Weather = (props: { location: Location }) => {
         >
             <Current weather={weather} />
             <View style={styles.childContainer}>
-                <WeatherForecast weather={weather} />
+                <WeatherForecastComponent weather={weather} />
             </View>
             <View style={styles.childContainer}>
-                <HumidityForecast weather={weather} />
+                <HumidityForecastComponent weather={weather} />
             </View>
             <View style={styles.childContainer}>
-                <RainForecast weather={weather} />
+                <RainForecastComponent weather={weather} />
             </View>
             <View style={styles.childContainer}>
-                <WindForecast weather={weather} />
+                <WindForecastComponent weather={weather} />
             </View>
         </ScrollView>
     );
@@ -109,4 +109,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Weather;
+export default WeatherComponent;
