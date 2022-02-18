@@ -17,39 +17,10 @@ test('search 봉천동', async () => {
 });
 
 test('search 이태원', async () => {
-    expect(await ns.searchLocation('이태원')).toStrictEqual<Location[]>([
-        { name: '서울특별시 용산구 이태원동', code: '09170130' },
-        { name: '서울특별시 용산구 이태원2동', code: '09170660' },
-        { name: '서울특별시 용산구 이태원1동', code: '09170650' },
-    ]);
-});
+    const locations = await ns.searchLocation('이태원');
 
-test('parse static weather page', async () => {
-    const rawHtml = fs.readFileSync('./service/test/weather-parse-test.html');
-    const weatherDoc = parse(rawHtml);
-
-    const parsedWeather = NaverService.parseWeather(weatherDoc);
-
-    expect(parsedWeather.condition).toBe<string>('소나기');
-    expect(parsedWeather.dust).toBe<string>('좋음');
-    expect(parsedWeather.condition).toBe<string>('소나기');
-    expect(parsedWeather.feel).toStrictEqual<Temperature>({
-        degrees: 23,
-        type: 0,
-    });
-    expect(parsedWeather.humidity).toBe<number>(95);
-    expect(parsedWeather.humidityForecasts.length).toBe<number>(70);
-    expect(parsedWeather.microDust).toBe<string>('좋음');
-    expect(parsedWeather.rainAmount).toBe<number>(0.1);
-    expect(parsedWeather.rainForecasts.length).toBe<number>(70);
-    expect(parsedWeather.temperature).toStrictEqual<Temperature>({
-        degrees: 21,
-        type: 0,
-    });
-    expect(parsedWeather.weatherForecasts.length).toBe<number>(71);
-    expect(parsedWeather.windDirection).toBe<string>('북북동풍');
-    expect(parsedWeather.windForecasts.length).toBe<number>(70);
-    expect(parsedWeather.windSpeed).toBe<number>(1);
+    expect(locations).not.toBeNull();
+    expect(locations.length).toBe(3);
 });
 
 test('parse live weather page', async () => {
