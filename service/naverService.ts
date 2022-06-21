@@ -11,6 +11,7 @@ import {
     WeatherService,
     WeatherSource,
     WindForecast,
+    WeeklyForecast,
 } from './weatherService';
 
 /**
@@ -41,6 +42,8 @@ export class NaverService implements LocationService, WeatherService {
     );
 
     static readonly NEW_LINE_REGEX: RegExp = new RegExp('\\r?\\n|\\r', 'gm');
+
+    static readonly DATE_REGEX: RegExp = new RegExp('(\\d+)\\.(\\d+)');
 
     private cookie: string;
 
@@ -179,6 +182,8 @@ export class NaverService implements LocationService, WeatherService {
         const humidityForecasts = hiddenForecasts.humidityForecasts;
         const windForecasts = hiddenForecasts.windForecasts;
 
+        const weeklyForecast = NaverService.parseWeeklyForecast(weatherDoc);
+
         return {
             temperature: currentTemperature,
             humidity: hiddenCurrent.humd,
@@ -193,6 +198,7 @@ export class NaverService implements LocationService, WeatherService {
             humidityForecasts: humidityForecasts,
             windForecasts: windForecasts,
             weatherForecasts: weatherForecasts,
+            weeklyForecast: weeklyForecast,
         };
     }
 
@@ -589,6 +595,94 @@ export class NaverService implements LocationService, WeatherService {
             0,
             0
         );
+    }
+
+    /**
+     * Parses the weekly forecast from the main weather page.
+     *
+     * @private
+     * @static
+     * @param {HTMLElement} weatherDoc
+     * @return {*}  {WeeklyForecast[]}
+     * @memberof NaverService
+     */
+    private static parseWeeklyForecast(
+        weatherDoc: HTMLElement
+    ): WeeklyForecast[] {
+        const weekItems = weatherDoc
+            .querySelector('.week_list')
+            ?.querySelectorAll('.week_item');
+
+        const today = new Date();
+
+        return weekItems.map((h: HTMLElement) => {
+            const dateResult = this.DATE_REGEX.exec(
+                h.querySelector('.date')!.textContent
+            )!;
+
+            const day = new Date(
+                today.getFullYear(),
+                +dateResult[1] - 1,
+                +dateResult[2]
+            );
+
+            const weatherInners = h
+                .querySelectorAll('.weather_inner')
+                .map(NaverService.parseWeatherInner);
+
+            return {
+                morning: {
+                    time: day,
+                    condition: weatherInners[0].condition,
+                    rainChance: weatherInners[0].rainChance,
+                    temperature: {
+                        degrees: +NaverService.TEMPERATURE_REGEX.exec(
+                            h
+                                .querySelector('.temperature')
+                                .querySelector('.lowest').textContent
+                        )![1],
+                        type: Scale.C,
+                    },
+                },
+                afternoon: {
+                    time: day,
+                    condition: weatherInners[1].condition,
+                    rainChance: weatherInners[1].rainChance,
+                    temperature: {
+                        degrees: +NaverService.TEMPERATURE_REGEX.exec(
+                            h
+                                .querySelector('.temperature')
+                                .querySelector('.highest').textContent
+                        )![1],
+                        type: Scale.C,
+                    },
+                },
+            };
+        });
+    }
+
+    /**
+     * Parse the data from the "weather_inner" node.
+     *
+     * @private
+     * @static
+     * @param {HTMLElement} inner
+     * @return {*}  {{
+     *         condition: string;
+     *         rainChance: number;
+     *     }}
+     * @memberof NaverService
+     */
+    private static parseWeatherInner(inner: HTMLElement): {
+        condition: string;
+        rainChance: number;
+    } {
+        return {
+            condition: inner.attributes['data-wetr-txt'],
+            rainChance: +NaverService.PERCENT_REGEX.exec(
+                inner.querySelector('.rainfall').textContent
+            )![1],
+        };
     }
 }
 

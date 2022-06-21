@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Pressable, Text } from 'react-native';
 
 import LocationComponent from './components/Location';
-import WeatherComponent from './components/Weather/Weather';
+import WeatherComponent, { CurrentView } from './components/Weather/Weather';
 
 import { Location } from './service/locationService';
 
@@ -16,16 +16,37 @@ export default function App() {
     const [currentLocation, setCurrentLocation] = useState<Location | null>(
         null
     );
+    const [currentView, setCurrentView] = useState<CurrentView>(
+        CurrentView.Today
+    );
 
     const onLocationChange = (location: Location) => {
         console.log(`on location change: ${JSON.stringify(location)}`);
         setCurrentLocation(location);
     };
 
+    const changeView = () => {
+        if (currentView === CurrentView.Today) {
+            setCurrentView(CurrentView.Weekly);
+        } else {
+            setCurrentView(CurrentView.Today);
+        }
+    };
+
     return (
         <View style={styles.container}>
-            <LocationComponent onLocationChange={onLocationChange} />
-            <WeatherComponent location={currentLocation} />
+            <View style={styles.topRow}>
+                <LocationComponent onLocationChange={onLocationChange} />
+                <Pressable style={styles.viewPress} onPress={changeView}>
+                    <Text style={styles.viewButton}>
+                        {CurrentView[currentView]}
+                    </Text>
+                </Pressable>
+            </View>
+            <WeatherComponent
+                location={currentLocation}
+                currentView={currentView}
+            />
         </View>
     );
 }
@@ -37,5 +58,19 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#fff',
         alignItems: 'center',
+    },
+    topRow: {
+        flexDirection: 'row',
+    },
+    viewPress: {
+        justifyContent: 'center',
+    },
+    viewButton: {
+        borderRadius: 13,
+        backgroundColor: 'honeydew',
+        alignSelf: 'center',
+        paddingHorizontal: 13,
+        paddingVertical: 7,
+        marginHorizontal: 10,
     },
 });

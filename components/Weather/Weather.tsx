@@ -12,11 +12,8 @@ import { weatherServiceInstance as weatherService } from '../../service/serviceF
 import { Location } from '../../service/locationService';
 import { Weather } from '../../service/weatherService';
 
-import Current from './Current';
-import HumidityForecastComponent from './HumidityForecast';
-import RainForecastComponent from './RainForecast';
-import WeatherForecastComponent from './WeatherForecast';
-import WindForecastComponent from './WindForecast';
+import WeeklyComponent from './WeeklyComponent';
+import TodayComponent from './TodayComponent';
 
 /**
  * The parent component of all weather child components.
@@ -24,8 +21,11 @@ import WindForecastComponent from './WindForecast';
  * @param {{ location: Location }} props
  * @return {*}
  */
-const WeatherComponent = (props: { location: Location }) => {
-    const { location } = props;
+const WeatherComponent = (props: {
+    location: Location;
+    currentView: CurrentView;
+}) => {
+    const { location, currentView } = props;
 
     const [weather, setWeather] = useState<Weather | null>(null);
     const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -79,34 +79,28 @@ const WeatherComponent = (props: { location: Location }) => {
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
         >
-            <Current weather={weather} />
-            <View style={styles.childContainer}>
-                <WeatherForecastComponent weather={weather} />
-            </View>
-            <View style={styles.childContainer}>
-                <HumidityForecastComponent weather={weather} />
-            </View>
-            <View style={styles.childContainer}>
-                <RainForecastComponent weather={weather} />
-            </View>
-            <View style={styles.childContainer}>
-                <WindForecastComponent weather={weather} />
-            </View>
+            {currentView === CurrentView.Today ? (
+                <TodayComponent weather={weather} />
+            ) : null}
+            {currentView === CurrentView.Weekly ? (
+                <WeeklyComponent weather={weather} />
+            ) : null}
         </ScrollView>
     );
 };
 
-const styles = StyleSheet.create({
-    mainView: {
-        flex: 1,
-    },
-    childContainer: {
-        flex: 1,
-        maxWidth: 400,
-    },
-    current: {
-        flex: 1,
-    },
-});
+export enum CurrentView {
+    Today,
+    Weekly,
+}
+
+// const styles = StyleSheet.create({
+//     mainView: {
+//         flex: 1,
+//     },
+//     current: {
+//         flex: 1,
+//     },
+// });
 
 export default WeatherComponent;

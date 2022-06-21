@@ -104,6 +104,8 @@ export interface Weather {
     humidityForecasts: HumidityForecast[];
     windForecasts: WindForecast[];
     weatherForecasts: WeatherForecast[];
+
+    weeklyForecast: WeeklyForecast[];
 }
 
 export interface Temperature {
@@ -143,4 +145,26 @@ export interface WindForecast {
     direction: string;
     speed: number;
     time: Date;
+}
+
+/**
+ * The forecast for a of the week.
+ *
+ * @interface WeeklyForecast
+ */
+export interface WeeklyForecast {
+    morning: BasicForecast;
+    afternoon: BasicForecast;
+}
+
+/**
+ * The forecast used for the days of the week.
+ *
+ * @interface BasicForecast
+ */
+export interface BasicForecast {
+    time: Date;
+    temperature: Temperature;
+    condition: string;
+    rainChance: number;
 }

@@ -40,6 +40,18 @@ test('parse live weather page', async () => {
     expect(parsedWeather.windDirection).not.toBeNull();
     expect(parsedWeather.windForecasts.length).toBeGreaterThan(0);
     expect(parsedWeather.windSpeed).toBeGreaterThan(-1);
+    expect(parsedWeather.weeklyForecast).not.toBeNull();
+    expect(parsedWeather.weeklyForecast.length).toBe(10);
+
+    const lastDay = new Date();
+    lastDay.setDate(lastDay.getDate() + 9);
+
+    expect(parsedWeather.weeklyForecast[9].afternoon.time.getMonth()).toBe(
+        lastDay.getMonth()
+    );
+    expect(parsedWeather.weeklyForecast[9].afternoon.time.getDate()).toBe(
+        lastDay.getDate()
+    );
 });
 
 test('set weather source', async () => {
