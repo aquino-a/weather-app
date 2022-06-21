@@ -32,7 +32,7 @@ export class NaverService implements LocationService, WeatherService {
         'g'
     );
     static readonly HIDDEN_DATA_REGEX: RegExp = new RegExp(
-        'var townFcastListJson = (\\[[^]+\\]);',
+        'var hourlyFcastListJson = (\\[[^]+\\]);',
         'gm'
     );
 
@@ -175,9 +175,8 @@ export class NaverService implements LocationService, WeatherService {
         const dust = NaverService.parseHiddenDust(weatherDoc);
 
         //forecasts
-        const weatherForecasts = NaverService.parseWeatherForecasts(weatherDoc);
-
         const hiddenForecasts = NaverService.parseHiddenForecasts(weatherDoc);
+        const weatherForecasts = hiddenForecasts.weatherForecasts;
         const rainForecasts = hiddenForecasts.rainForecasts;
         const humidityForecasts = hiddenForecasts.humidityForecasts;
         const windForecasts = hiddenForecasts.windForecasts;
@@ -399,6 +398,7 @@ export class NaverService implements LocationService, WeatherService {
         rainForecasts: RainForecast[];
         humidityForecasts: HumidityForecast[];
         windForecasts: WindForecast[];
+        weatherForecasts: WeatherForecast[];
     } {
         const scripts = weatherDoc.querySelectorAll('script');
         const lastScriptText = scripts[scripts.length - 1].textContent;
@@ -416,6 +416,7 @@ export class NaverService implements LocationService, WeatherService {
                 rainForecasts: [],
                 humidityForecasts: [],
                 windForecasts: [],
+                weatherForecasts: [],
             };
         }
 
@@ -440,6 +441,14 @@ export class NaverService implements LocationService, WeatherService {
             windForecasts: data.map(hf => ({
                 direction: hf.windDrctnName,
                 speed: Number(hf.windSpd),
+                time: NaverService.parseTime(hf.aplYmdt),
+            })),
+            weatherForecasts: data.map(hf => ({
+                condition: hf.wetrTxt,
+                temperature: {
+                    degrees: hf.tmpr,
+                    type: Scale.C,
+                },
                 time: NaverService.parseTime(hf.aplYmdt),
             })),
         };
