@@ -17,7 +17,6 @@ import {
 const NAVER_BASE_URL: string = 'weather.naver.com';
 const TEMPERATURE_REGEX: RegExp = new RegExp('(\\d+)(?:°|도)');
 const PERCENT_REGEX: RegExp = new RegExp('(\\d+)%');
-const SPEED_REGEX: RegExp = new RegExp('(\\d+) *m/s');
 const RAIN_REGEX: RegExp = new RegExp('(\\d+(?:\\.\\d+)?) *mm');
 const COOKIE_REGEX: RegExp = new RegExp('[A-Z\\d_]+="?[A-Za-z\\d]*=?"?', 'g');
 const HIDDEN_DATA_REGEX: RegExp = new RegExp(
@@ -29,8 +28,6 @@ const HIDDEN_CURRENT_DATA_REGEX: RegExp = new RegExp(
     'var weatherSummary = ([^]+}});',
     'gm'
 );
-
-// const NEW_LINE_REGEX: RegExp = new RegExp('\\r?\\n|\\r', 'gm');
 
 const DATE_REGEX: RegExp = new RegExp('(\\d+)\\.(\\d+)');
 
@@ -219,35 +216,6 @@ const parseHiddenCurrent = (weatherDoc: HTMLElement): HiddenForecast => {
 };
 
 /**
- * Parses the details of the summary list in the weather area.
- *
- * @private
- * @static
- * @param {Element} weatherArea
- * @return {*}  {*}
- * @memberof naverService
- */
-const parseListDetails = (weatherArea: HTMLElement): any => {
-    const list = weatherArea
-        .querySelector('.summary_list')!
-        .childNodes.filter(n => n instanceof HTMLElement);
-
-    const start = list.findIndex(n => n.textContent === '습도'); //-1 or the index
-
-    return {
-        humidity: Number(PERCENT_REGEX.exec(list[start + 1].textContent)[1]),
-        windDirection: list[start + 2].textContent,
-        windSpeed: Number(SPEED_REGEX.exec(list[start + 3].textContent)[1]),
-        feel: {
-            degrees: Number(
-                TEMPERATURE_REGEX.exec(list[start + 5].textContent)[1]
-            ),
-            type: Scale.C,
-        },
-    };
-};
-
-/**
  * Parse the rain details from the weather area.
  *
  * @private
@@ -306,55 +274,6 @@ const findWeatherSummary = (weatherDoc: HTMLElement): any => {
         console.log(error);
         throw error;
     }
-};
-
-/**
- * Parse the dust details from the main weather document.
- *
- * @private
- * @static
- * @param {HTMLElement} weatherDoc
- * @return {*}  {*}
- * @memberof naverService
- */
-const parseDust = (weatherDoc: HTMLElement): any => {
-    const list = weatherDoc
-        .querySelector('.today_chart_list')
-        .querySelectorAll('.level_text');
-
-    return {
-        dust: list[0].textContent,
-        microDust: list[1].textContent,
-    };
-};
-
-/**
- * Parse the weather forecasts from the main weather page.
- *
- * @private
- * @static
- * @param {HTMLElement} weatherDoc
- * @return {*}  {weatherForecast[]}
- * @memberof naverService
- */
-const parseWeatherForecasts = (weatherDoc: HTMLElement): WeatherForecast[] => {
-    return weatherDoc
-        .querySelector('.time_list.align_left')
-        .childNodes.filter(n => n instanceof HTMLElement)
-        .map(n => n as HTMLElement)
-        .map((e: HTMLElement): WeatherForecast => {
-            const degrees = Number(e.getAttribute('data-tmpr'));
-            const condition = e.getAttribute('data-wetr-txt') as string;
-
-            const dateTime = e.getAttribute('data-ymdt') as string;
-            const time = parseTime(dateTime);
-
-            return {
-                temperature: { degrees: degrees, type: Scale.C },
-                condition: condition,
-                time: time,
-            };
-        });
 };
 
 /**
@@ -430,129 +349,6 @@ const parseHiddenForecasts = (
             time: parseTime(hf.aplYmdt),
         })),
     };
-};
-
-/**
- * Parse the rain forecasts from the main weather page.
- *
- * @private
- * @static
- * @param {HTMLElement} weatherDoc
- * @return {*}  {rainForecast[]}
- * @memberof naverService
- */
-const parseRainForecasts = (weatherDoc: HTMLElement): RainForecast[] => {
-    const rainSection = weatherDoc.querySelector(
-        'div[data-nclk="wtk.rainhrscr"]'
-    );
-
-    const percentages = rainSection
-        ?.querySelector('tr.row_icon')
-        ?.querySelectorAll('td.data');
-
-    const amounts = rainSection
-        ?.querySelector('tr.row_graph.row_rain')
-        ?.querySelectorAll('td.data');
-
-    if (
-        percentages === undefined ||
-        amounts === undefined ||
-        percentages.length !== amounts.length
-    ) {
-        return [];
-    }
-
-    const rainForecasts: RainForecast[] = [];
-    for (let i = 0; i < percentages.length; i++) {
-        const percentage = percentages[i];
-        const amount = amounts[i];
-
-        rainForecasts.push({
-            percentChance: Number(
-                percentage.querySelector('em.value')?.textContent
-            ),
-            amount: Number(amount.querySelector('div.data_inner')?.textContent),
-            time: parseTime(percentage.getAttribute('data-ymdt') as string),
-        });
-    }
-
-    return rainForecasts;
-};
-
-/**
- * Parse the humidity forecasts from the main weather page.
- *
- * @private
- * @static
- * @param {HTMLElement} weatherDoc
- * @return {*}  {humidityForecast[]}
- * @memberof naverService
- */
-const parseHumidityForecasts = (
-    weatherDoc: HTMLElement
-): HumidityForecast[] => {
-    const humiditySection = weatherDoc.querySelector(
-        'div[data-nclk="wtk.humihrscr"]'
-    );
-
-    const humidities = humiditySection?.querySelectorAll('td.data');
-
-    if (humidities === undefined) {
-        return [];
-    }
-
-    return Array.from(humidities).map(
-        (e: Element): HumidityForecast => ({
-            humidity: Number(e.querySelector('span.num')?.textContent),
-            time: parseTime(e.getAttribute('data-ymdt') as string),
-        })
-    );
-};
-
-/**
- * Parse the wind forecasts from the main weather page.
- *
- * @private
- * @static
- * @param {Document} weatherDoc
- * @return {*}  {windForecast[]}
- * @memberof naverService
- */
-const parseWindForecasts = (weatherDoc: HTMLElement): WindForecast[] => {
-    const windSection = weatherDoc.querySelector(
-        'div[data-nclk="wtk.windhrscr"]'
-    );
-
-    const directions = windSection
-        ?.querySelector('tr.row_icon')
-        ?.querySelectorAll('td.data');
-
-    const speeds = windSection
-        ?.querySelector('tr.row_graph')
-        ?.querySelectorAll('td.data');
-
-    if (
-        directions === undefined ||
-        speeds === undefined ||
-        directions.length !== speeds.length
-    ) {
-        return [];
-    }
-
-    const windForecasts: WindForecast[] = [];
-    for (let i = 0; i < directions.length; i++) {
-        const direction = directions[i];
-        const speed = speeds[i];
-
-        windForecasts.push({
-            direction: direction.querySelector('span.value')
-                ?.textContent as string,
-            speed: Number(speed.querySelector('span.num')?.textContent),
-            time: parseTime(speed.getAttribute('data-ymdt') as string),
-        });
-    }
-
-    return windForecasts;
 };
 
 /**
