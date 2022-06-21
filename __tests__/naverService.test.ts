@@ -1,23 +1,11 @@
-import { parse } from 'node-html-parser';
+import naverServiceInstance, { searchLocation } from '../service/naverService';
+import { WeatherSource } from '../service/weatherService';
 
-import { Location } from '../service/locationService';
-import naverServiceInstance, { NaverService } from '../service/naverService';
-import { Temperature, WeatherSource } from '../service/weatherService';
-
-const fs = require('fs');
 const fetch = require('node-fetch');
 global.fetch = fetch;
 
-const ns = new NaverService();
-
-test('search 봉천동', async () => {
-    expect(await ns.searchLocation('봉천동')).toStrictEqual<Location[]>([
-        { name: '서울특별시 관악구 봉천동', code: '09620101' },
-    ]);
-});
-
 test('search 이태원', async () => {
-    const locations = await ns.searchLocation('이태원');
+    const locations = await searchLocation('이태원');
 
     expect(locations).not.toBeNull();
     expect(locations.length).toBe(3);
