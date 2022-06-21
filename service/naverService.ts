@@ -197,7 +197,7 @@ const parseTemperature = (weatherArea: HTMLElement): Temperature => {
     const line = weatherArea.querySelector('.current')!.textContent;
 
     return {
-        degrees: Number(TEMPERATURE_REGEX.exec(line)[1]),
+        degrees: Number(TEMPERATURE_REGEX.exec(line)![1]),
         type: Scale.C,
     };
 };
@@ -233,7 +233,7 @@ const parseRain = (weatherArea: HTMLElement): number => {
 
     const rainAmount = rainArea.querySelector('strong').textContent;
 
-    return Number(RAIN_REGEX.exec(rainAmount)[1]);
+    return Number(RAIN_REGEX.exec(rainAmount)![1]);
 };
 
 /**
