@@ -1,4 +1,4 @@
-import { weatherService, locationService } from './naverService';
+import { weatherService, locationService } from './naver';
 import { LocationService } from './locationService';
 import { WeatherService } from './weatherService';
 

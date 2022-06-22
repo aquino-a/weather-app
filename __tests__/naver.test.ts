@@ -1,4 +1,4 @@
-import naverServiceInstance, { searchLocation } from '../service/naverService';
+import naverServiceInstance, { searchLocation } from '../service/naver';
 import { WeatherSource } from '../service/weatherService';
 
 const fetch = require('node-fetch');
