@@ -145,7 +145,6 @@ const parseWeather = (weatherDoc: HTMLElement): Weather => {
         '.weather_area'
     ) as HTMLElement;
 
-    const currentTemperature = parseTemperature(weatherArea);
     const hiddenCurrent = parseHiddenCurrent(weatherDoc);
     const currentCondition = weatherArea.querySelector('.weather')!
         .textContent as string;
@@ -162,7 +161,7 @@ const parseWeather = (weatherDoc: HTMLElement): Weather => {
     const weeklyForecast = parseWeeklyForecast(weatherDoc);
 
     return {
-        temperature: currentTemperature,
+        temperature: { degrees: hiddenCurrent.tmpr, type: Scale.C },
         humidity: hiddenCurrent.humd,
         windSpeed: hiddenCurrent.windSpd,
         windDirection: hiddenCurrent.windDrctnName,
@@ -176,21 +175,6 @@ const parseWeather = (weatherDoc: HTMLElement): Weather => {
         windForecasts: windForecasts,
         weatherForecasts: weatherForecasts,
         weeklyForecast: weeklyForecast,
-    };
-};
-
-/**
- * Parses the temperature from the weather area section.
- *
- * @param {Element} weatherArea
- * @return {*}  {temperature}
- */
-const parseTemperature = (weatherArea: HTMLElement): Temperature => {
-    const line = weatherArea.querySelector('.current')!.textContent;
-
-    return {
-        degrees: Number(TEMPERATURE_REGEX.exec(line)![1]),
-        type: Scale.C,
     };
 };
 
