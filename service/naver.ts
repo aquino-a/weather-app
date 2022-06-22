@@ -21,7 +21,7 @@ const HIDDEN_CURRENT_DATA_REGEX: RegExp = /var weatherSummary = ([^]+}})/;
 const DATE_REGEX: RegExp = /(\d+)\.(\d+)/;
 const DATE_TIME_REGEX: RegExp = /(\d{4})(\d{2})(\d{2})(\d{2})/;
 
-var cookie: string;
+let cookie: string;
 
 /**
  * Searchs the naver api for the location name and location code using a text query.
@@ -256,6 +256,9 @@ const parseHiddenForecasts = (weatherDoc: HTMLElement): Forecast[] => {
             rainAmount = rainAmount.substring(index);
         }
 
+        // sometimes the probablity is '-' instead of 0
+        let rainProbability = hf.rainProb === '-' ? '0' : hf.rainProb;
+
         return {
             time: parseTime(hf.aplYmdt),
 
@@ -266,7 +269,7 @@ const parseHiddenForecasts = (weatherDoc: HTMLElement): Forecast[] => {
             },
 
             amount: Number(rainAmount),
-            percentChance: Number(hf.rainProb),
+            percentChance: Number(rainProbability),
 
             humidity: Number(hf.humd),
 
@@ -385,7 +388,7 @@ const parseWeatherInner = (
  */
 interface HiddenForecast {
     aplYmdt: string;
-    rainProb: number;
+    rainProb: string;
     rainAmt: string;
     humd: number;
     windDrctn: string;
