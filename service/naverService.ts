@@ -38,7 +38,6 @@ var cookie: string;
  *
  * @param {string} query the location to search for by name.
  * @return {*}  {Promise<location[]>}
- * @memberof naverService
  */
 export const searchLocation = async (query: string): Promise<Location[]> => {
     const url = new URL(`https://ac.${NAVER_BASE_URL}/ac`);
@@ -59,7 +58,6 @@ export const searchLocation = async (query: string): Promise<Location[]> => {
  * Parses the object returned by the naver location api.
  *
  * @param {*} rawObject the object containing the results.
- * @memberof naverService
  */
 const parseLocations = (rawObject: any): Location[] => {
     if (
@@ -82,8 +80,7 @@ const parseLocations = (rawObject: any): Location[] => {
  * Searchs for the weather based on the location code.
  *
  * @param {string} locationCode the code of the location to search for.
- * @return {*}  {Promise<weather>}
- * @memberof naverService
+ * @return {*}  {Promise<Weather>}
  */
 export const searchWeather = async (locationCode: string): Promise<Weather> => {
     const url = new URL(
@@ -112,7 +109,6 @@ export const searchWeather = async (locationCode: string): Promise<Weather> => {
  *
  * @param {WeatherSource} source
  * @return {*}  {Promise<void>}
- * @memberof naverService
  */
 const setWeatherSource = async (
     locationCode: string,
@@ -139,10 +135,9 @@ const setWeatherSource = async (
 /**
  * Parse the weather from a naver weather page.
  *
- * @static
  * @param {Document} weatherDoc the naver weather web page.
  * @return {*}  {(weather)} the weather data from the web page.
- * @memberof naverService
+
  */
 const parseWeather = (weatherDoc: HTMLElement): Weather => {
     // weather_area
@@ -187,11 +182,8 @@ const parseWeather = (weatherDoc: HTMLElement): Weather => {
 /**
  * Parses the temperature from the weather area section.
  *
- * @private
- * @static
  * @param {Element} weatherArea
  * @return {*}  {temperature}
- * @memberof naverService
  */
 const parseTemperature = (weatherArea: HTMLElement): Temperature => {
     const line = weatherArea.querySelector('.current')!.textContent;
@@ -205,10 +197,8 @@ const parseTemperature = (weatherArea: HTMLElement): Temperature => {
 /**
  * Retrieves the hidden json data containing the current weather from the main weather page.
  *
- * @static
  * @param {HTMLElement} weatherDoc
  * @return {*}  {HiddenForecast}
- * @memberof naverService
  */
 const parseHiddenCurrent = (weatherDoc: HTMLElement): HiddenForecast => {
     const weatherSummary = findWeatherSummary(weatherDoc);
@@ -218,11 +208,8 @@ const parseHiddenCurrent = (weatherDoc: HTMLElement): HiddenForecast => {
 /**
  * Parse the rain details from the weather area.
  *
- * @private
- * @static
  * @param {HTMLElement} weatherArea
  * @return {*}  {number}
- * @memberof naverService
  */
 const parseRain = (weatherArea: HTMLElement): number => {
     const rainArea = weatherArea.querySelector('.summary_rainfall');
@@ -239,11 +226,8 @@ const parseRain = (weatherArea: HTMLElement): number => {
 /**
  * Parses the hidden air data in the main weather page.
  *
- * @private
- * @static
  * @param {HTMLElement} weatherDoc
  * @return {*}  {HiddenAirForecast}
- * @memberof naverService
  */
 const parseHiddenDust = (weatherDoc: HTMLElement): HiddenAirForecast => {
     const weatherSummary = findWeatherSummary(weatherDoc);
@@ -253,11 +237,8 @@ const parseHiddenDust = (weatherDoc: HTMLElement): HiddenAirForecast => {
 /**
  * Finds and parses the hidden weather summary data from the main weather page.
  *
- * @private
- * @static
  * @param {HTMLElement} weatherDoc
  * @return {*}  {*}
- * @memberof naverService
  */
 const findWeatherSummary = (weatherDoc: HTMLElement): any => {
     const scripts = weatherDoc.querySelectorAll('script');
@@ -280,14 +261,12 @@ const findWeatherSummary = (weatherDoc: HTMLElement): any => {
  * Finds the hidden weather data js object in the web page
  * and parses the data.
  *
- * @static
  * @param {HTMLElement} weatherDoc
  * @return {*}  {{
  *         rainForecasts: rainForecast[],
  *         humidityForecasts: humidityForecast[],
  *         windForecasts: windForecast[]
  *     }}
- * @memberof naverService
  */
 const parseHiddenForecasts = (
     weatherDoc: HTMLElement
@@ -354,11 +333,8 @@ const parseHiddenForecasts = (
 /**
  * Parse a date from a date time string in the main weather page.
  *
- * @private
- * @static
  * @param {string} dateTime
  * @return {*}  {Date}
- * @memberof naverService
  */
 const parseTime = (dateTime: string): Date => {
     return new Date(
@@ -375,11 +351,8 @@ const parseTime = (dateTime: string): Date => {
 /**
  * Parses the weekly forecast from the main weather page.
  *
- * @private
- * @static
  * @param {HTMLElement} weatherDoc
  * @return {*}  {WeeklyForecast[]}
- * @memberof NaverService
  */
 const parseWeeklyForecast = (weatherDoc: HTMLElement): WeeklyForecast[] => {
     const weekItems = weatherDoc
@@ -436,14 +409,11 @@ const parseWeeklyForecast = (weatherDoc: HTMLElement): WeeklyForecast[] => {
 /**
  * Parse the data from the "weather_inner" node.
  *
- * @private
- * @static
  * @param {HTMLElement} inner
  * @return {*}  {{
  *         condition: string;
  *         rainChance: number;
  *     }}
- * @memberof NaverService
  */
 const parseWeatherInner = (
     inner: HTMLElement
