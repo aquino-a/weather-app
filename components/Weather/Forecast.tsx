@@ -1,24 +1,29 @@
 import React from 'react';
 import { ListRenderItem, View, Text, FlatList } from 'react-native';
 
-import { Weather, WeatherForecast } from '../../service/weatherService';
+import { Forecast, Weather } from '../../service/weatherService';
 import { baseStyle, getItemStyle } from './weatherChildren';
 
 /**
- * A component that displays the weather forecasts.
+ * A component that displays the forecasts.
  *
  * @param {{ weather: Weather }} props
  * @return {*}
  */
-const WeatherForecastComponent = (props: { weather: Weather }) => {
-    const { weatherForecasts } = props.weather!;
+const ForecastComponent = (props: { weather: Weather }) => {
+    const { forecasts } = props.weather!;
 
-    const renderWeather: ListRenderItem<WeatherForecast> = ({ item }) => {
+    const renderWeather: ListRenderItem<Forecast> = ({ item }) => {
         return (
             <View style={[getItemStyle(item.time), baseStyle]}>
                 <Text>{item.time.getHours()}</Text>
                 <Text>{item.condition}</Text>
                 <Text>{item.temperature.degrees}°</Text>
+                <Text>{item.humidity}%</Text>
+                <Text>{item.direction}</Text>
+                <Text>{item.speed}m/s</Text>
+                <Text>{item.percentChance}%</Text>
+                <Text>{item.amount}mm</Text>
             </View>
         );
     };
@@ -28,7 +33,7 @@ const WeatherForecastComponent = (props: { weather: Weather }) => {
             <Text>Weather:</Text>
             <FlatList
                 // style={styles.list}
-                data={weatherForecasts}
+                data={forecasts}
                 renderItem={renderWeather}
                 keyExtractor={(weather, index) =>
                     weather.time.getTime().toString() + index
@@ -39,4 +44,4 @@ const WeatherForecastComponent = (props: { weather: Weather }) => {
     );
 };
 
-export default WeatherForecastComponent;
+export default ForecastComponent;

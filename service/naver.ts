@@ -2,14 +2,10 @@ import { HTMLElement, parse } from 'node-html-parser';
 
 import { Location, LocationService } from './locationService';
 import {
-    HumidityForecast,
-    RainForecast,
     Scale,
-    Temperature,
     Weather,
-    WeatherForecast,
     WeatherSource,
-    WindForecast,
+    Forecast,
     WeeklyForecast,
     WeatherService,
 } from './weatherService';
@@ -30,6 +26,7 @@ const HIDDEN_CURRENT_DATA_REGEX: RegExp = new RegExp(
 );
 
 const DATE_REGEX: RegExp = new RegExp('(\\d+)\\.(\\d+)');
+const DATE_TIME_REGEX: RegExp = /(\d{4})(\d{2})(\d{2})(\d{2})/;
 
 var cookie: string;
 
@@ -153,10 +150,6 @@ const parseWeather = (weatherDoc: HTMLElement): Weather => {
 
     //forecasts
     const hiddenForecasts = parseHiddenForecasts(weatherDoc);
-    const weatherForecasts = hiddenForecasts.weatherForecasts;
-    const rainForecasts = hiddenForecasts.rainForecasts;
-    const humidityForecasts = hiddenForecasts.humidityForecasts;
-    const windForecasts = hiddenForecasts.windForecasts;
 
     const weeklyForecast = parseWeeklyForecast(weatherDoc);
 
@@ -170,10 +163,7 @@ const parseWeather = (weatherDoc: HTMLElement): Weather => {
         microDust: dust.stationPM25Legend1,
         condition: currentCondition,
         rainAmount: rainAmount,
-        rainForecasts: rainForecasts,
-        humidityForecasts: humidityForecasts,
-        windForecasts: windForecasts,
-        weatherForecasts: weatherForecasts,
+        forecasts: hiddenForecasts,
         weeklyForecast: weeklyForecast,
     };
 };
@@ -247,19 +237,10 @@ const findWeatherSummary = (weatherDoc: HTMLElement): any => {
  *
  * @param {HTMLElement} weatherDoc
  * @return {*}  {{
- *         rainForecasts: rainForecast[],
- *         humidityForecasts: humidityForecast[],
- *         windForecasts: windForecast[]
+ *          forecasts: Forecast[];,
  *     }}
  */
-const parseHiddenForecasts = (
-    weatherDoc: HTMLElement
-): {
-    rainForecasts: RainForecast[];
-    humidityForecasts: HumidityForecast[];
-    windForecasts: WindForecast[];
-    weatherForecasts: WeatherForecast[];
-} => {
+const parseHiddenForecasts = (weatherDoc: HTMLElement): Forecast[] => {
     const scripts = weatherDoc.querySelectorAll('script');
     const lastScriptText = scripts[scripts.length - 1].textContent;
 
@@ -272,46 +253,34 @@ const parseHiddenForecasts = (
     } catch (error) {
         console.log(`last script: ${lastScriptText}`);
         console.log(error);
-        return {
-            rainForecasts: [],
-            humidityForecasts: [],
-            windForecasts: [],
-            weatherForecasts: [],
-        };
+        return [];
     }
 
-    return {
-        rainForecasts: data.map(hf => {
-            let rainAmount = hf.rainAmt;
-            if (rainAmount.lastIndexOf('~') >= 0) {
-                const index = rainAmount.lastIndexOf('~') + 1;
-                rainAmount = rainAmount.substr(index);
-            }
+    return data.map(hf => {
+        let rainAmount = hf.rainAmt;
+        if (rainAmount.lastIndexOf('~') >= 0) {
+            const index = rainAmount.lastIndexOf('~') + 1;
+            rainAmount = rainAmount.substring(index);
+        }
 
-            return {
-                amount: Number(rainAmount),
-                percentChance: Number(hf.rainProb),
-                time: parseTime(hf.aplYmdt),
-            };
-        }),
-        humidityForecasts: data.map(hf => ({
-            humidity: Number(hf.humd),
+        return {
             time: parseTime(hf.aplYmdt),
-        })),
-        windForecasts: data.map(hf => ({
-            direction: hf.windDrctnName,
-            speed: Number(hf.windSpd),
-            time: parseTime(hf.aplYmdt),
-        })),
-        weatherForecasts: data.map(hf => ({
+
             condition: hf.wetrTxt,
             temperature: {
                 degrees: hf.tmpr,
                 type: Scale.C,
             },
-            time: parseTime(hf.aplYmdt),
-        })),
-    };
+
+            amount: Number(rainAmount),
+            percentChance: Number(hf.rainProb),
+
+            humidity: Number(hf.humd),
+
+            direction: hf.windDrctnName,
+            speed: Number(hf.windSpd),
+        };
+    });
 };
 
 /**
@@ -321,11 +290,14 @@ const parseHiddenForecasts = (
  * @return {*}  {Date}
  */
 const parseTime = (dateTime: string): Date => {
+    DATE_TIME_REGEX.lastIndex = 0;
+    const match = DATE_TIME_REGEX.exec(dateTime);
+
     return new Date(
-        Number(dateTime.substr(0, 4)),
-        Number(dateTime.substr(4, 2)) - 1,
-        Number(dateTime.substr(6, 2)),
-        Number(dateTime.substr(8, 2)),
+        Number(match![1]),
+        Number(match![2]),
+        Number(match![3]),
+        Number(match![4]),
         0,
         0,
         0

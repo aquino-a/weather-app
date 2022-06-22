@@ -2,10 +2,7 @@ import { Weather } from '../../service/weatherService';
 import { View, StyleSheet } from 'react-native';
 import React from 'react';
 import Current from './Current';
-import WeatherForecastComponent from './WeatherForecast';
-import HumidityForecastComponent from './HumidityForecast';
-import RainForecastComponent from './RainForecast';
-import WindForecastComponent from './WindForecast';
+import ForecastComponent from './Forecast';
 
 const TodayComponent = (props: { weather: Weather }) => {
     const weather = props.weather!;
@@ -14,16 +11,7 @@ const TodayComponent = (props: { weather: Weather }) => {
         <View>
             <Current weather={weather} />
             <View style={styles.childContainer}>
-                <WeatherForecastComponent weather={weather} />
-            </View>
-            <View style={styles.childContainer}>
-                <HumidityForecastComponent weather={weather} />
-            </View>
-            <View style={styles.childContainer}>
-                <RainForecastComponent weather={weather} />
-            </View>
-            <View style={styles.childContainer}>
-                <WindForecastComponent weather={weather} />
+                <ForecastComponent weather={weather} />
             </View>
         </View>
     );

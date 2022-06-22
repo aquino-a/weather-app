@@ -100,10 +100,7 @@ export interface Weather {
     condition: string;
     rainAmount: number;
 
-    rainForecasts: RainForecast[];
-    humidityForecasts: HumidityForecast[];
-    windForecasts: WindForecast[];
-    weatherForecasts: WeatherForecast[];
+    forecasts: Forecast[];
 
     weeklyForecast: WeeklyForecast[];
 }
@@ -122,6 +119,20 @@ export enum WeatherSource {
     ACCUWEATHER,
     KMA,
     TWC,
+}
+
+export interface Forecast {
+    time: Date;
+    temperature: Temperature;
+    condition: string;
+
+    percentChance: number;
+    amount: number;
+
+    humidity: number;
+
+    direction: string;
+    speed: number;
 }
 
 export interface WeatherForecast {

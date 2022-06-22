@@ -19,14 +19,10 @@ test('parse live weather page', async () => {
     expect(parsedWeather.condition).not.toBeNull();
     expect(parsedWeather.feel).not.toBeNull();
     expect(parsedWeather.humidity).toBeGreaterThan(0);
-    expect(parsedWeather.humidityForecasts.length).toBeGreaterThan(0);
     expect(parsedWeather.microDust).not.toBeNull();
     expect(parsedWeather.rainAmount).toBeGreaterThan(-1);
-    expect(parsedWeather.rainForecasts.length).toBeGreaterThan(0);
     expect(parsedWeather.temperature).not.toBeNull();
-    expect(parsedWeather.weatherForecasts.length).toBeGreaterThan(0);
     expect(parsedWeather.windDirection).not.toBeNull();
-    expect(parsedWeather.windForecasts.length).toBeGreaterThan(0);
     expect(parsedWeather.windSpeed).toBeGreaterThan(-1);
     expect(parsedWeather.weeklyForecast).not.toBeNull();
     expect(parsedWeather.weeklyForecast.length).toBe(10);
@@ -40,6 +36,16 @@ test('parse live weather page', async () => {
     expect(parsedWeather.weeklyForecast[9].afternoon.time.getDate()).toBe(
         lastDay.getDate()
     );
+
+    expect(parsedWeather.forecasts.length).toBeGreaterThan(0);
+    for (let i = 1; i < parsedWeather.forecasts.length; i++) {
+        const a = parsedWeather.forecasts[i - 1];
+        const b = parsedWeather.forecasts[i];
+
+        a.time.setHours(a.time.getHours() + 1);
+
+        expect(a.time).toBe<Date>(b.time);
+    }
 });
 
 test('set weather source', async () => {
