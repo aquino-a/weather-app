@@ -1,6 +1,6 @@
 import { HTMLElement, parse } from 'node-html-parser';
 
-import { Location } from './locationService';
+import { Location, LocationService } from './locationService';
 import {
     HumidityForecast,
     RainForecast,
@@ -459,9 +459,13 @@ interface HiddenAirForecast {
     stationPM25Legend1: string;
 }
 
-const naverServiceInstance: WeatherService = {
+export const weatherService: WeatherService = {
     searchWeather: searchWeather,
     setWeatherSource: setWeatherSource,
 };
 
-export default naverServiceInstance;
+export const locationService: LocationService = {
+    searchLocation: searchLocation,
+};
+
+export default weatherService;
