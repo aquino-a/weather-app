@@ -11,21 +11,14 @@ import {
 } from './weatherService';
 
 const NAVER_BASE_URL: string = 'weather.naver.com';
-const TEMPERATURE_REGEX: RegExp = new RegExp('(\\d+)(?:°|도)');
-const PERCENT_REGEX: RegExp = new RegExp('(\\d+)%');
-const RAIN_REGEX: RegExp = new RegExp('(\\d+(?:\\.\\d+)?) *mm');
-const COOKIE_REGEX: RegExp = new RegExp('[A-Z\\d_]+="?[A-Za-z\\d]*=?"?', 'g');
-const HIDDEN_DATA_REGEX: RegExp = new RegExp(
-    'var hourlyFcastListJson = (\\[[^]+\\]);',
-    'gm'
-);
 
-const HIDDEN_CURRENT_DATA_REGEX: RegExp = new RegExp(
-    'var weatherSummary = ([^]+}});',
-    'gm'
-);
-
-const DATE_REGEX: RegExp = new RegExp('(\\d+)\\.(\\d+)');
+const TEMPERATURE_REGEX: RegExp = /(\d+)(?:°|도)/;
+const PERCENT_REGEX: RegExp = /(\d+)%/;
+const RAIN_REGEX: RegExp = /(\d+(?:\.\d+)?) *mm/;
+const COOKIE_REGEX: RegExp = /[A-Z\d_]+="?[A-Za-z\d]*=?"?/g;
+const HIDDEN_DATA_REGEX: RegExp = /var hourlyFcastListJson = (\[[^]+\]);/gm;
+const HIDDEN_CURRENT_DATA_REGEX: RegExp = /var weatherSummary = ([^]+}})/;
+const DATE_REGEX: RegExp = /(\d+)\.(\d+)/;
 const DATE_TIME_REGEX: RegExp = /(\d{4})(\d{2})(\d{2})(\d{2})/;
 
 var cookie: string;
