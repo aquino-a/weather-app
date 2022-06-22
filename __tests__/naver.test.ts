@@ -44,7 +44,7 @@ test('parse live weather page', async () => {
 
         a.time.setHours(a.time.getHours() + 1);
 
-        expect(a.time).toBe<Date>(b.time);
+        expect(a.time).toEqual<Date>(b.time);
     }
 });
 
