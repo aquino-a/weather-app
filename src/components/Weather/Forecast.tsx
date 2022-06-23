@@ -1,8 +1,7 @@
 import React from 'react';
-import { ListRenderItem, View, Text, FlatList } from 'react-native';
+import { ListRenderItem, View, Text, FlatList, StyleSheet } from 'react-native';
 
 import { Forecast, Weather } from '../../service/weatherService';
-import { baseStyle, getItemStyle } from './weatherChildren';
 
 /**
  * A component that displays the forecasts.
@@ -15,15 +14,29 @@ const ForecastComponent = (props: { weather: Weather }) => {
 
     const renderWeather: ListRenderItem<Forecast> = ({ item }) => {
         return (
-            <View style={[getItemStyle(item.time), baseStyle]}>
-                <Text>{item.time.getHours()}</Text>
+            <View style={[getBackColor(item.time), styles.base]}>
+                <Text style={[getForeColor(item.time), time.base]}>
+                    {item.time.getHours()}시
+                </Text>
                 <Text>{item.condition}</Text>
-                <Text>{item.temperature.degrees}°</Text>
-                <Text>{item.humidity}%</Text>
-                <Text>{item.direction}</Text>
-                <Text>{item.speed}m/s</Text>
-                <Text>{item.percentChance}%</Text>
-                <Text>{item.amount}mm</Text>
+                <Text style={[styles.temp, time.base]}>
+                    {item.temperature.degrees}°
+                </Text>
+                {item.percentChance === 0 ? (
+                    <View>
+                        <Text>-</Text>
+                        <Text>-</Text>
+                    </View>
+                ) : (
+                    <View>
+                        <Text>{item.percentChance}%</Text>
+                        <Text>{item.amount}mm</Text>
+                    </View>
+                )}
+
+                <Text style={humid.base}>{item.humidity}%</Text>
+                <Text style={wind.base}>{item.direction}</Text>
+                <Text style={wind.base}>{item.speed}m/s</Text>
             </View>
         );
     };
@@ -43,5 +56,97 @@ const ForecastComponent = (props: { weather: Weather }) => {
         </View>
     );
 };
+
+const getBackColor = (date: Date): { backgroundColor: string } => {
+    return getTemporalStyle(
+        date,
+        backgrounds.today,
+        backgrounds.tomorrow,
+        backgrounds.tomorrowTomorrow
+    );
+};
+
+const getForeColor = (date: Date): { backgroundColor: string } => {
+    return getTemporalStyle(
+        date,
+        time.today,
+        time.tomorrow,
+        time.tomorrowTomorrow
+    );
+};
+
+const getTemporalStyle = (
+    date: Date,
+    todayStyle: any,
+    tomorrowStyle: any,
+    tomorrowTomorrowStyle: any
+) => {
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+    const tomorrowTomorrow = new Date();
+    tomorrowTomorrow.setDate(today.getDate() + 2);
+
+    if (date.getDate() === today.getDate()) {
+        return todayStyle;
+    } else if (date.getDate() === tomorrow.getDate()) {
+        return tomorrowStyle;
+    } else if (date.getDate() === tomorrowTomorrow.getDate()) {
+        return tomorrowTomorrowStyle;
+    } else {
+        return todayStyle;
+    }
+};
+
+const backgrounds = StyleSheet.create({
+    today: {
+        backgroundColor: 'transparent',
+    },
+    tomorrow: {
+        backgroundColor: 'ivory',
+    },
+    tomorrowTomorrow: {
+        backgroundColor: 'snow',
+    },
+});
+
+const time = StyleSheet.create({
+    base: {
+        fontWeight: '700',
+        fontSize: 12,
+    },
+    today: {
+        color: '#bcbcbc',
+    },
+    tomorrow: {
+        color: '#7a59f1',
+    },
+    tomorrowTomorrow: {
+        color: '#45c1e0',
+    },
+});
+
+const wind = StyleSheet.create({
+    base: {
+        fontSize: 14,
+        color: '#407dd0',
+    },
+});
+
+const humid = StyleSheet.create({
+    base: wind.base,
+});
+
+const styles = StyleSheet.create({
+    base: {
+        paddingHorizontal: 2,
+        alignItems: 'center',
+    },
+    temp: {
+        color: '#232323',
+        fontSize: 14,
+        fontWeight: '700',
+    },
+});
 
 export default ForecastComponent;
