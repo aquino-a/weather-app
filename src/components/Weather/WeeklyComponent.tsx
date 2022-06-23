@@ -165,6 +165,7 @@ const styles = StyleSheet.create({
         borderColor: '#cfd4d6',
         borderRadius: 8,
         borderWidth: 1,
+        marginTop: 2,
     },
     main: {
         marginTop: 10,

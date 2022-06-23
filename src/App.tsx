@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Pressable, Text } from 'react-native';
+import { StyleSheet, View, Pressable, Text, Dimensions } from 'react-native';
 
 import LocationComponent from './components/Location';
 import WeatherComponent, { CurrentView } from './components/Weather/Weather';
@@ -43,10 +43,12 @@ export default function App() {
                     </Text>
                 </Pressable>
             </View>
-            <WeatherComponent
-                location={currentLocation}
-                currentView={currentView}
-            />
+            <View style={styles.weather}>
+                <WeatherComponent
+                    location={currentLocation}
+                    currentView={currentView}
+                />
+            </View>
         </View>
     );
 }
@@ -72,5 +74,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 13,
         paddingVertical: 7,
         marginHorizontal: 10,
+    },
+    weather: {
+        width: Dimensions.get('window').width,
+        padding: 10,
     },
 });
