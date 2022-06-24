@@ -1,5 +1,5 @@
 import naverServiceInstance, { searchLocation } from '../service/naver';
-import { WeatherSource } from '../service/weatherService';
+import { Weather } from '../service/weatherService';
 
 const fetch = require('node-fetch');
 global.fetch = fetch;
@@ -11,9 +11,7 @@ test('search 이태원', async () => {
     expect(locations.length).toBe(3);
 });
 
-test('parse live weather page', async () => {
-    var parsedWeather = await naverServiceInstance.searchWeather('09170130');
-
+const testParsedWeather = (parsedWeather: Weather) => {
     expect(parsedWeather.condition).not.toBeNull();
     expect(parsedWeather.dust).not.toBeNull();
     expect(parsedWeather.condition).not.toBeNull();
@@ -46,16 +44,18 @@ test('parse live weather page', async () => {
 
         expect(a.time).toEqual<Date>(b.time);
     }
+};
+
+test('parse live weather page', async () => {
+    const parsedWeather = await naverServiceInstance.searchWeather('09170130');
+
+    testParsedWeather(parsedWeather);
 });
 
-test('set weather source', async () => {
-    var parsedWeather = await naverServiceInstance.searchWeather('09170130');
-
-    await naverServiceInstance.setWeatherSource(
-        '09170130',
-        WeatherSource.ACCUWEATHER
+test('parse live weather page - global location', async () => {
+    const parsedWeather = await naverServiceInstance.searchWeather(
+        'WDUSA15235'
     );
-    // var newParsedWeather = await naverServiceInstance.searchWeather('09170130');
 
-    console.log(JSON.stringify(parsedWeather));
+    testParsedWeather(parsedWeather);
 });

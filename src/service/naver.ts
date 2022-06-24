@@ -14,8 +14,11 @@ const NAVER_BASE_URL: string = 'weather.naver.com';
 
 const TEMPERATURE_REGEX: RegExp = /(\d+)(?:°|도)/;
 const PERCENT_REGEX: RegExp = /(\d+)%/;
+const SPEED_REGEX: RegExp = /(\d+) *m\/s/;
+const DIRECTION_REGEX: RegExp = /([가-힣]{3,4}풍)/;
 const RAIN_REGEX: RegExp = /(\d+(?:\.\d+)?) *mm/;
 const COOKIE_REGEX: RegExp = /[A-Z\d_]+="?[A-Za-z\d]*=?"?/g;
+const IS_DOMESTIC_REGEX: RegExp = /isDomestic = (true|false);/g;
 const HIDDEN_DATA_REGEX: RegExp = /var hourlyFcastListJson = (\[[^]+\]);/gm;
 const HIDDEN_CURRENT_DATA_REGEX: RegExp = /var weatherSummary = ([^]+}})/;
 const DATE_REGEX: RegExp = /(\d+)\.(\d+)/;
@@ -134,27 +137,32 @@ const parseWeather = (weatherDoc: HTMLElement): Weather => {
     const weatherArea = weatherDoc.querySelector(
         '.weather_area'
     ) as HTMLElement;
+    const isDom = isDomestic(weatherDoc);
 
-    const hiddenCurrent = parseHiddenCurrent(weatherDoc);
-    const currentCondition = weatherArea.querySelector('.weather')!
-        .textContent as string;
+    const current = isDom
+        ? parseHiddenCurrent(weatherDoc)
+        : parseGlobalCurrent(weatherDoc);
+
     const rainAmount = parseRain(weatherArea);
-    const dust = parseHiddenDust(weatherDoc);
+
+    const dust = isDom
+        ? parseHiddenDust(weatherDoc)
+        : { stationPM10Legend1: '?', stationPM25Legend1: '?' };
 
     //forecasts
     const hiddenForecasts = parseHiddenForecasts(weatherDoc);
 
-    const weeklyForecast = parseWeeklyForecast(weatherDoc);
+    const weeklyForecast = isDom ? parseWeeklyForecast(weatherDoc) : [];
 
     return {
-        temperature: { degrees: hiddenCurrent.tmpr, type: Scale.C },
-        humidity: hiddenCurrent.humd,
-        windSpeed: hiddenCurrent.windSpd,
-        windDirection: hiddenCurrent.windDrctnName,
-        feel: { degrees: hiddenCurrent.stmpr, type: Scale.C },
+        temperature: { degrees: current.tmpr, type: Scale.C },
+        humidity: current.humd,
+        windSpeed: current.windSpd,
+        windDirection: current.windDrctnName,
+        feel: { degrees: current.stmpr, type: Scale.C },
         dust: dust.stationPM10Legend1,
         microDust: dust.stationPM25Legend1,
-        condition: currentCondition,
+        condition: current.wetrTxt,
         rainAmount: rainAmount,
         forecasts: hiddenForecasts,
         weeklyForecast: weeklyForecast,
@@ -202,26 +210,75 @@ const parseHiddenDust = (weatherDoc: HTMLElement): HiddenAirForecast => {
 };
 
 /**
+ * Gets whether the current location is a global location.
+ *
+ * @param {HTMLElement} weatherDoc
+ * @return {*}  {*}
+ */
+const isDomestic = (weatherDoc: HTMLElement): boolean => {
+    const lastScriptText = getLastScript(weatherDoc);
+
+    try {
+        IS_DOMESTIC_REGEX.lastIndex = 0;
+        let lastMatch: RegExpExecArray;
+        for (
+            let match = IS_DOMESTIC_REGEX.exec(lastScriptText);
+            match !== null;
+            match = IS_DOMESTIC_REGEX.exec(lastScriptText)
+        ) {
+            lastMatch = match;
+        }
+
+        return lastMatch![1] === 'true';
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
+/**
  * Finds and parses the hidden weather summary data from the main weather page.
  *
  * @param {HTMLElement} weatherDoc
  * @return {*}  {*}
  */
 const findWeatherSummary = (weatherDoc: HTMLElement): any => {
-    const scripts = weatherDoc.querySelectorAll('script');
-    const lastScriptText = scripts[scripts.length - 1].textContent.replace(
-        /[\n\r]/g,
-        ''
-    );
+    const lastScriptText = getLastScript(weatherDoc);
 
     try {
         HIDDEN_CURRENT_DATA_REGEX.lastIndex = 0;
         return JSON.parse(HIDDEN_CURRENT_DATA_REGEX.exec(lastScriptText)![1]);
     } catch (error) {
-        console.log(`last script: ${lastScriptText}`);
         console.log(error);
         throw error;
     }
+};
+
+const parseGlobalCurrent = (weatherDoc: HTMLElement): HiddenForecast => {
+    const weatherArea = weatherDoc.querySelector('.weather_area');
+    const secondRow = weatherArea
+        .querySelector('.weather_table')
+        .querySelector('.second');
+
+    return {
+        tmpr: +weatherArea.querySelector('strong.current').childNodes[2]
+            .rawText,
+        stmpr: +TEMPERATURE_REGEX.exec(
+            weatherArea.querySelector('span.temperature.on').innerText
+        )![1],
+        wetrTxt: weatherArea.querySelector('span.weather').textContent,
+        humd: +PERCENT_REGEX.exec(
+            secondRow
+                .querySelectorAll('td')
+                .find(td => td.innerHTML.indexOf('습도') > -1)!.innerText
+        )![1],
+        windSpd: +SPEED_REGEX.exec(secondRow.innerText)![1],
+        windDrctn: '',
+        windDrctnName: DIRECTION_REGEX.exec(secondRow.innerText)![1],
+        aplYmdt: '',
+        rainAmt: '0',
+        rainProb: '',
+    };
 };
 
 /**
@@ -234,8 +291,7 @@ const findWeatherSummary = (weatherDoc: HTMLElement): any => {
  *     }}
  */
 const parseHiddenForecasts = (weatherDoc: HTMLElement): Forecast[] => {
-    const scripts = weatherDoc.querySelectorAll('script');
-    const lastScriptText = scripts[scripts.length - 1].textContent;
+    const lastScriptText = getLastScript(weatherDoc);
 
     let data;
     try {
@@ -244,14 +300,13 @@ const parseHiddenForecasts = (weatherDoc: HTMLElement): Forecast[] => {
             HIDDEN_DATA_REGEX.exec(lastScriptText)![1]
         ) as HiddenForecast[];
     } catch (error) {
-        console.log(`last script: ${lastScriptText}`);
         console.log(error);
         return [];
     }
 
     return data.map(hf => {
         let rainAmount = hf.rainAmt;
-        if (rainAmount.lastIndexOf('~') >= 0) {
+        if (rainAmount instanceof String && rainAmount.lastIndexOf('~') >= 0) {
             const index = rainAmount.lastIndexOf('~') + 1;
             rainAmount = rainAmount.substring(index);
         }
@@ -262,7 +317,7 @@ const parseHiddenForecasts = (weatherDoc: HTMLElement): Forecast[] => {
         return {
             time: parseTime(hf.aplYmdt),
 
-            condition: hf.wetrTxt,
+            condition: hf.wetrTxt === null ? hf.wetrTxtNew : hf.wetrTxt,
             temperature: {
                 degrees: hf.tmpr,
                 type: Scale.C,
@@ -277,6 +332,17 @@ const parseHiddenForecasts = (weatherDoc: HTMLElement): Forecast[] => {
             speed: Number(hf.windSpd),
         };
     });
+};
+
+/**
+ * Gets the last script in the document.
+ *
+ * @param {HTMLElement} doc
+ * @return {*}  {string} the last script in the document.
+ */
+const getLastScript = (doc: HTMLElement): string => {
+    const scripts = doc.querySelectorAll('script');
+    return scripts[scripts.length - 1].textContent;
 };
 
 /**
@@ -389,7 +455,7 @@ const parseWeatherInner = (
 interface HiddenForecast {
     aplYmdt: string;
     rainProb: string;
-    rainAmt: string;
+    rainAmt: any;
     humd: number;
     windDrctn: string;
     windDrctnName: string;
@@ -397,6 +463,7 @@ interface HiddenForecast {
     tmpr: number;
     stmpr: number;
     wetrTxt: string;
+    wetrTxtNew: any;
 }
 
 /**
