@@ -2,6 +2,7 @@ import React from 'react';
 import { ListRenderItem, View, Text, FlatList, StyleSheet } from 'react-native';
 
 import { Forecast, Weather } from '../../service/weatherService';
+import { getRainStyle } from './WeeklyComponent';
 
 /**
  * A component that displays the forecasts.
@@ -24,13 +25,17 @@ const ForecastComponent = (props: { weather: Weather }) => {
                 </Text>
                 {item.percentChance === 0 ? (
                     <View>
-                        <Text>-</Text>
-                        <Text>-</Text>
+                        <Text style={getRainStyle(0)}>-</Text>
+                        <Text style={getRainStyle(0)}>-</Text>
                     </View>
                 ) : (
                     <View>
-                        <Text>{item.percentChance}%</Text>
-                        <Text>{item.amount}mm</Text>
+                        <Text style={getRainStyle(item.percentChance)}>
+                            {item.percentChance}%
+                        </Text>
+                        <Text style={getRainStyle(item.percentChance)}>
+                            {item.amount}mm
+                        </Text>
                     </View>
                 )}
 

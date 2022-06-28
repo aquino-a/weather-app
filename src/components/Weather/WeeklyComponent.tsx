@@ -56,7 +56,7 @@ const WeeklyComponent = (props: { weather: Weather }) => {
 
 const days = ['일', '월', '화', '수', '목', '금', '토'];
 
-const getRainStyle = (rainChance: number) => {
+export const getRainStyle = (rainChance: number) => {
     if (rainChance <= 0) {
         return rain.none;
     } else if (rainChance <= 40) {
