@@ -267,6 +267,7 @@ const parseGlobalCurrent = (weatherDoc: HTMLElement): HiddenForecast => {
             weatherArea.querySelector('span.temperature.on').innerText
         )![1],
         wetrTxt: weatherArea.querySelector('span.weather').textContent,
+        wetrTxtNew: '',
         humd: +PERCENT_REGEX.exec(
             secondRow
                 .querySelectorAll('td')
@@ -306,7 +307,10 @@ const parseHiddenForecasts = (weatherDoc: HTMLElement): Forecast[] => {
 
     return data.map(hf => {
         let rainAmount = hf.rainAmt;
-        if (rainAmount instanceof String && rainAmount.lastIndexOf('~') >= 0) {
+        if (
+            typeof rainAmount === 'string' &&
+            rainAmount.lastIndexOf('~') >= 0
+        ) {
             const index = rainAmount.lastIndexOf('~') + 1;
             rainAmount = rainAmount.substring(index);
         }
