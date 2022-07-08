@@ -351,6 +351,7 @@ const getLastScript = (doc: HTMLElement): string => {
 
 /**
  * Parse a date from a date time string in the main weather page.
+ * The month in the dateTime is assumed to start at 0.
  *
  * @param {string} dateTime
  * @return {*}  {Date}
@@ -361,7 +362,7 @@ const parseTime = (dateTime: string): Date => {
 
     return new Date(
         Number(year),
-        Number(month),
+        Number(month + 1),
         Number(day),
         Number(hour),
         0,
