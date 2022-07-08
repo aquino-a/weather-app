@@ -358,7 +358,7 @@ const getLastScript = (doc: HTMLElement): string => {
  */
 const parseTime = (dateTime: string): Date => {
     DATE_TIME_REGEX.lastIndex = 0;
-    const [, year, month, day, hour  ] = DATE_TIME_REGEX.exec(dateTime)!;
+    const [, year, month, day, hour] = DATE_TIME_REGEX.exec(dateTime)!;
 
     return new Date(
         Number(year),
