@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    Alert,
-    ScrollView,
-    RefreshControl,
-} from 'react-native';
+import { View, Text, Alert, ScrollView, RefreshControl } from 'react-native';
 
 import { weatherServiceInstance as weatherService } from '../../service/serviceFactory';
 import { Location } from '../../service/locationService';

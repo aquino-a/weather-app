@@ -18,7 +18,7 @@ const WeeklyComponent = (props: { weather: Weather }) => {
                     <Text style={getDayStyle(wf.morning.time.getDay())}>
                         {days[wf.morning.time.getDay()]}
                     </Text>
-                    <Text  style={getDateStyle(wf.morning.time.getDay())}>
+                    <Text style={getDateStyle(wf.morning.time.getDay())}>
                         {wf.morning.time.getMonth()}.{wf.morning.time.getDate()}
                     </Text>
                 </View>
