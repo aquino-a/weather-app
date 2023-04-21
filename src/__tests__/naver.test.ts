@@ -16,6 +16,7 @@ const testParsedWeather = (parsedWeather: Weather) => {
     expect(parsedWeather.dust).not.toBeNull();
     expect(parsedWeather.condition).not.toBeNull();
     expect(parsedWeather.feel).not.toBeNull();
+    expect(parsedWeather.feel.degrees).toBeGreaterThan(-1);
     expect(parsedWeather.humidity).toBeGreaterThan(0);
     expect(parsedWeather.microDust).not.toBeNull();
     expect(parsedWeather.rainAmount).toBeGreaterThan(-1);
@@ -59,4 +60,3 @@ test('parse live weather page - global location', async () => {
 
     testParsedWeather(parsedWeather);
 });
-

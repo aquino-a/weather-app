@@ -267,18 +267,11 @@ const parseGlobalCurrent = (weatherDoc: HTMLElement): HiddenForecast => {
         .querySelector('.second');
 
     return {
-        tmpr: +weatherArea.querySelector('strong.current').childNodes[2]
-            .rawText,
-        stmpr: +TEMPERATURE_REGEX.exec(
-            weatherArea.querySelector('span.temperature.on').innerText
-        )![1],
+        tmpr: getGlobalTemperature(weatherArea),
+        stmpr: getGlobalFeelTemp(weatherArea),
         wetrTxt: weatherArea.querySelector('span.weather').textContent,
         wetrTxtNew: '',
-        humd: +PERCENT_REGEX.exec(
-            secondRow
-                .querySelectorAll('td')
-                .find(td => td.innerHTML.indexOf('습도') > -1)!.innerText
-        )![1],
+        humd: getGlobalHumidity(secondRow),
         windSpd: +SPEED_REGEX.exec(secondRow.innerText)![1],
         windDrctn: '',
         windDrctnName: DIRECTION_REGEX.exec(secondRow.innerText)![1],
@@ -286,6 +279,39 @@ const parseGlobalCurrent = (weatherDoc: HTMLElement): HiddenForecast => {
         rainAmt: '0',
         rainProb: '',
     };
+};
+
+const getGlobalTemperature = (weatherArea: HTMLElement): number => {
+    const temp =
+        weatherArea.querySelector('strong.current').childNodes[2].rawText;
+
+    return +temp;
+};
+
+const getGlobalFeelTemp = (weatherArea: HTMLElement): number => {
+    const text = weatherArea.querySelector('span.temperature.on').innerText;
+    const execArray = TEMPERATURE_REGEX.exec(text);
+
+    if (execArray == null || execArray.length < 2) {
+        console.log(`global feel temperature not found:\n ${weatherArea}`);
+        return -1;
+    }
+
+    return +execArray[1];
+};
+
+const getGlobalHumidity = (secondRow: HTMLElement): number => {
+    const text = secondRow
+        .querySelectorAll('td')
+        .find(td => td.innerHTML.indexOf('습도') > -1)!.innerText;
+    const execArray = PERCENT_REGEX.exec(text);
+
+    if (execArray == null || execArray.length < 2) {
+        console.log(`global humidity not found:\n ${secondRow}`);
+        return -1;
+    }
+
+    return +execArray[1];
 };
 
 /**
