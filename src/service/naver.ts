@@ -20,7 +20,7 @@ const RAIN_REGEX: RegExp = /(\d+(?:\.\d+)?) *mm/;
 const COOKIE_REGEX: RegExp = /[A-Z\d_]+="?[A-Za-z\d]*=?"?/g;
 const IS_DOMESTIC_REGEX: RegExp = /isDomestic = (true|false);/g;
 const HIDDEN_DATA_REGEX: RegExp = /var hourlyFcastListJson = (\[[^]+\]);/gm;
-const HIDDEN_CURRENT_DATA_REGEX: RegExp = /var weatherSummary = ([^]+}})/;
+const HIDDEN_CURRENT_DATA_REGEX: RegExp = /var weatherSummary = ([^]+}});/;
 const DATE_REGEX: RegExp = /(\d+)\.(\d+)/;
 const DATE_TIME_REGEX: RegExp = /(\d{4})(\d{2})(\d{2})(\d{2})/;
 
@@ -247,7 +247,13 @@ const findWeatherSummary = (weatherDoc: HTMLElement): any => {
 
     try {
         HIDDEN_CURRENT_DATA_REGEX.lastIndex = 0;
-        return JSON.parse(HIDDEN_CURRENT_DATA_REGEX.exec(lastScriptText)![1]);
+        const execArray = HIDDEN_CURRENT_DATA_REGEX.exec(lastScriptText);
+        if (execArray == null) {
+            console.log(`Hidden data not found !!:\n ${lastScriptText}`);
+            return {};
+        }
+
+        return JSON.parse(execArray[1]);
     } catch (error) {
         console.log(error);
         throw error;
