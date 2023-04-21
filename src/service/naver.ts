@@ -272,9 +272,9 @@ const parseGlobalCurrent = (weatherDoc: HTMLElement): HiddenForecast => {
         wetrTxt: weatherArea.querySelector('span.weather').textContent,
         wetrTxtNew: '',
         humd: getGlobalHumidity(secondRow),
-        windSpd: +SPEED_REGEX.exec(secondRow.innerText)![1],
+        windSpd: getGlobalSpeed(secondRow),
         windDrctn: '',
-        windDrctnName: DIRECTION_REGEX.exec(secondRow.innerText)![1],
+        windDrctnName: getGlobalDirection(secondRow),
         aplYmdt: '',
         rainAmt: '0',
         rainProb: '',
@@ -312,6 +312,30 @@ const getGlobalHumidity = (secondRow: HTMLElement): number => {
     }
 
     return +execArray[1];
+};
+
+const getGlobalSpeed = (secondRow: HTMLElement): number => {
+    const text = secondRow.innerText;
+    const execArray = SPEED_REGEX.exec(text);
+
+    if (execArray == null || execArray.length < 2) {
+        console.log(`global wind speed not found:\n ${secondRow}`);
+        return -1;
+    }
+
+    return +execArray[1];
+};
+
+const getGlobalDirection = (secondRow: HTMLElement): string => {
+    const text = secondRow.innerText;
+    const execArray = DIRECTION_REGEX.exec(text);
+
+    if (execArray == null || execArray.length < 2) {
+        console.log(`global direction temperature not found:\n ${secondRow}`);
+        return '??';
+    }
+
+    return execArray[1];
 };
 
 /**
