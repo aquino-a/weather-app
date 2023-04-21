@@ -23,18 +23,6 @@ const testParsedWeather = (parsedWeather: Weather) => {
     expect(parsedWeather.temperature).not.toBeNull();
     expect(parsedWeather.windDirection).not.toBeNull();
     expect(parsedWeather.windSpeed).toBeGreaterThan(-1);
-    expect(parsedWeather.weeklyForecast).not.toBeNull();
-    expect(parsedWeather.weeklyForecast.length).toBe(10);
-
-    const lastDay = new Date();
-    lastDay.setDate(lastDay.getDate() + 9);
-
-    expect(parsedWeather.weeklyForecast[9].afternoon.time.getMonth()).toBe(
-        lastDay.getMonth()
-    );
-    expect(parsedWeather.weeklyForecast[9].afternoon.time.getDate()).toBe(
-        lastDay.getDate()
-    );
 
     expect(parsedWeather.forecasts.length).toBeGreaterThan(0);
     for (let i = 1; i < parsedWeather.forecasts.length; i++) {
@@ -47,10 +35,26 @@ const testParsedWeather = (parsedWeather: Weather) => {
     }
 };
 
+const testWeeklyForecasts = (parsedWeather: Weather) => {
+    expect(parsedWeather.weeklyForecast).not.toBeNull();
+    expect(parsedWeather.weeklyForecast.length).toBe(10);
+
+    const lastDay = new Date();
+    lastDay.setDate(lastDay.getDate() + 9);
+
+    expect(parsedWeather.weeklyForecast[9].afternoon.time.getMonth()).toBe(
+        lastDay.getMonth()
+    );
+    expect(parsedWeather.weeklyForecast[9].afternoon.time.getDate()).toBe(
+        lastDay.getDate()
+    );
+};
+
 test('parse live weather page', async () => {
     const parsedWeather = await naverServiceInstance.searchWeather('09170130');
 
     testParsedWeather(parsedWeather);
+    testWeeklyForecasts(parsedWeather);
 });
 
 test('parse live weather page - global location', async () => {
@@ -59,4 +63,5 @@ test('parse live weather page - global location', async () => {
     );
 
     testParsedWeather(parsedWeather);
+    // weekly reports for global locations are not supported.
 });
