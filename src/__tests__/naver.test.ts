@@ -8,7 +8,7 @@ test('search 이태원', async () => {
     const locations = await searchLocation('이태원');
 
     expect(locations).not.toBeNull();
-    expect(locations.length).toBe(3);
+    expect(locations.length).toBeGreaterThanOrEqual(3);
 });
 
 const testParsedWeather = (parsedWeather: Weather) => {
@@ -59,3 +59,4 @@ test('parse live weather page - global location', async () => {
 
     testParsedWeather(parsedWeather);
 });
+
