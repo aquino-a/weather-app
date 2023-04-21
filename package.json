@@ -44,7 +44,8 @@
             "jsx",
             "json",
             "node"
-        ]
+        ],
+        "setupFiles": ["./__mocks__/jestSetupFile.js"]
     },
     "prettier": {
         "trailingComma": "es5",
