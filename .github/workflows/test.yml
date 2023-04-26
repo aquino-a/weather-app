@@ -25,23 +25,8 @@ jobs:
             - name: Build Android Release
               run: |
                   NODE_OPTIONS=--openssl-legacy-provider npm run build-android
-            - name: Upload Artifact (x86)
+            - name: Upload Artifacts
               uses: actions/upload-artifact@v1
               with:
-                  name: app-x86-debug.apk
-                  path: android/app/build/outputs/apk/debug/
-            - name: Upload Artifact (x64)
-              uses: actions/upload-artifact@v1
-              with:
-                  name: app-x86_64-debug.apk
-                  path: android/app/build/outputs/apk/debug/
-            - name: Upload Artifact (armeabi)
-              uses: actions/upload-artifact@v1
-              with:
-                  name: app-armeabi-v7a-debug.apk
-                  path: android/app/build/outputs/apk/debug/
-            - name: Upload Artifact (arm64)
-              uses: actions/upload-artifact@v1
-              with:
-                  name: app-arm64-v8a-debug.apk
+                  name: apks.zip
                   path: android/app/build/outputs/apk/debug/
