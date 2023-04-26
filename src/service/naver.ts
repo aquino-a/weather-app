@@ -15,7 +15,7 @@ const NAVER_BASE_URL: string = 'weather.naver.com';
 const TEMPERATURE_REGEX: RegExp = /(\d+)(?:°|도)/;
 const PERCENT_REGEX: RegExp = /(\d+)%/;
 const SPEED_REGEX: RegExp = /(\d+) *m\/s/;
-const DIRECTION_REGEX: RegExp = /([가-힣]{3,4}풍)/;
+const DIRECTION_REGEX: RegExp = /([가-힣]{2,4}풍)/;
 const RAIN_REGEX: RegExp = /(\d+(?:\.\d+)?) *mm/;
 const COOKIE_REGEX: RegExp = /[A-Z\d_]+="?[A-Za-z\d]*=?"?/g;
 const IS_DOMESTIC_REGEX: RegExp = /isDomestic = (true|false);/g;
@@ -331,7 +331,7 @@ const getGlobalDirection = (secondRow: HTMLElement): string => {
     const execArray = DIRECTION_REGEX.exec(text);
 
     if (execArray == null || execArray.length < 2) {
-        console.log(`global direction temperature not found:\n ${secondRow}`);
+        console.log(`global direction not found:\n ${secondRow}`);
         return '??';
     }
 
