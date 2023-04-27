@@ -31,7 +31,6 @@ jobs:
             - name: Build app
               working-directory: ./ios
               run: |
-                  ls -al
                   xcodebuild -workspace WeatherApp.xcworkspace -scheme WeatherApp archive -archivePath WeatherApp.xcarchive -allowProvisioningUpdates
                   xcodebuild -exportArchive -archivePath ./WeatherApp.xcarchive -exportPath . -exportOptionsPlist WeatherApp/Info.plist
                   mv WeatherApp.ipa ../WeatherApp.ipa
