@@ -29,11 +29,11 @@ jobs:
                   cd ios && pod install
             - name: Build app
               run: |
-                  xcodebuild -workspace myapp.xcworkspace -scheme myapp archive -archivePath myapp.xcarchive -allowProvisioningUpdates
-                  xcodebuild -exportArchive -archivePath ./myapp.xcarchive -exportPath . -exportOptionsPlist myapp/Info.plist
-                  mv myapp.ipa ../myapp.ipa
+                  xcodebuild -workspace WeatherApp.xcworkspace -scheme myapp archive -archivePath WeatherApp.xcarchive -allowProvisioningUpdates
+                  xcodebuild -exportArchive -archivePath ./WeatherApp.xcarchive -exportPath . -exportOptionsPlist WeatherApp/Info.plist
+                  mv WeatherApp.ipa ../WeatherApp.ipa
             - name: Upload Artifact
               uses: actions/upload-artifact@v1
               with:
-                  name: myapp.ipa
+                  name: WeatherApp.ipa
                   path: ios/build/
