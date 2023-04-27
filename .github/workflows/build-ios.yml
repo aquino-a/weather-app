@@ -25,12 +25,13 @@ jobs:
               run: |
                   npm install
             - name: Install pod dependencies
+              working-directory: ./ios
               run: |
-                  cd ios && pod install
+                  pod install
             - name: Build app
+              working-directory: ./ios
               run: |
                   ls -al
-                  cd ios
                   xcodebuild -workspace WeatherApp.xcworkspace -scheme WeatherApp archive -archivePath WeatherApp.xcarchive -allowProvisioningUpdates
                   xcodebuild -exportArchive -archivePath ./WeatherApp.xcarchive -exportPath . -exportOptionsPlist WeatherApp/Info.plist
                   mv WeatherApp.ipa ../WeatherApp.ipa
